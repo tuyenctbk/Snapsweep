@@ -1,0 +1,6 @@
+{
+  "name": "SnapSweep",
+  "description": "Privacy-first local photo & screenshot cleaner. Reclaim gigabytes offline with zero ads.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
