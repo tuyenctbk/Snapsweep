@@ -62,7 +62,8 @@ object FirebaseManager {
     }
 
     fun isFeatureEnabled(featureKey: String, defaultValue: Boolean = true): Boolean {
-        // Mock / Remote Config fetching
+        // TODO: Replace with FirebaseRemoteConfig.getInstance().getBoolean(featureKey)
+        //       once Firebase Remote Config is fully integrated.
         return defaultValue
     }
 }

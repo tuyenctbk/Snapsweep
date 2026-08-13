@@ -52,7 +52,6 @@ data class MainUiState(
     val bgWorkerMessage: String? = null,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val showRateDialog: Boolean = false,
-    val showThemeDialog: Boolean = false,
     val showSettingsDialog: Boolean = false,
     val showPrivacyInfoDialog: Boolean = false,
     val isPowerSavingMode: Boolean = false,
@@ -66,8 +65,8 @@ data class MainUiState(
     val showGestureGuideOverlay: Boolean = false,
     val hasSeenGestureGuide: Boolean = false,
     val weeklyWorkerMessage: String? = null,
-    val cleanupStreakDays: Int = 3,
-    val lastCleanupDateMillis: Long = System.currentTimeMillis()
+    val cleanupStreakDays: Int = 0,
+    val lastCleanupDateMillis: Long = 0L
 )
 
 class MainViewModel(
@@ -570,10 +569,6 @@ class MainViewModel(
         FirebaseManager.logEvent("theme_changed", mapOf("mode" to mode.name))
     }
 
-    fun setShowThemeDialog(show: Boolean) {
-        _uiState.update { it.copy(showThemeDialog = show) }
-    }
-
     fun setShowSettingsDialog(show: Boolean) {
         _uiState.update { it.copy(showSettingsDialog = show) }
     }
@@ -674,13 +669,16 @@ class MainViewModel(
         val expiredTrashItems = _uiState.value.pendingTrash.filter { it.dateTakenMillis < thirtyDaysAgo }
 
         if (expiredTrashItems.isNotEmpty()) {
-            val freedBytes = expiredTrashItems.sumOf { it.sizeBytes }
+            // Remove from pending trash UI state first, then permanently delete from disk
             _uiState.update { state ->
                 val remainingTrash = state.pendingTrash.filter { !expiredTrashItems.contains(it) }
-                state.copy(
-                    pendingTrash = remainingTrash,
-                    userNotification = "Auto-purged ${expiredTrashItems.size} items older than 30 days from Recently Deleted trash!"
-                )
+                state.copy(pendingTrash = remainingTrash)
+            }
+            viewModelScope.launch {
+                performDirectDeletion(context, expiredTrashItems)
+                _uiState.update {
+                    it.copy(userNotification = "Auto-purged ${expiredTrashItems.size} items older than 30 days.")
+                }
             }
         }
     }

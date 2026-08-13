@@ -89,26 +89,7 @@ class MainActivity : ComponentActivity() {
                         viewModel.scheduleWeeklyCleanupWorker(context)
                         viewModel.checkAndExecute30DayAutoPurge(context)
                         viewModel.checkPowerSavingMode(context)
-
-                        val permissionsNeeded = mutableListOf<String>()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                                permissionsNeeded.add(Manifest.permission.READ_MEDIA_IMAGES)
-                            }
-                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
-                                permissionsNeeded.add(Manifest.permission.READ_MEDIA_VIDEO)
-                            }
-                        } else {
-                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                permissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            }
-                        }
-
-                        if (permissionsNeeded.isNotEmpty()) {
-                            permissionLauncher.launch(permissionsNeeded.toTypedArray())
-                        } else {
-                            viewModel.scan(context)
-                        }
+                        requestGalleryPermissions()
                     }
                 }
 
@@ -119,7 +100,10 @@ class MainActivity : ComponentActivity() {
                     if (result.resultCode == RESULT_OK) {
                         viewModel.onDeleteRequestCompleted(context, uiState.pendingDeleteItems)
                     } else {
+                        // User cancelled — clear the pending request and re-scan so categories
+                        // are refreshed and no stale items remain visible in the UI.
                         viewModel.clearPendingDeleteRequest()
+                        viewModel.scan(context)
                     }
                 }
 

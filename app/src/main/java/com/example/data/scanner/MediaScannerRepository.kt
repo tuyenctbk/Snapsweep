@@ -200,7 +200,7 @@ class MediaScannerRepository(
             val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)
 
             while (cursor.moveToNext()) {
-                val id = cursor.getLong(idColumn) + 1_000_000L
+                val id = cursor.getLong(idColumn)
                 if (keptIds.contains(id)) continue
 
                 val name = cursor.getString(nameColumn) ?: "Video"
@@ -209,7 +209,7 @@ class MediaScannerRepository(
                 if (dateTaken == 0L) dateTaken = System.currentTimeMillis()
                 val mime = cursor.getString(mimeColumn) ?: "video/mp4"
 
-                val contentUri = ContentUris.withAppendedId(videoUri, id - 1_000_000L)
+                val contentUri = ContentUris.withAppendedId(videoUri, id)
 
                 mediaList.add(
                     MediaItem(

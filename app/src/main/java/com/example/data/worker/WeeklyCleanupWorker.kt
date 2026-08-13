@@ -23,6 +23,8 @@ class WeeklyCleanupWorker(
         const val CHANNEL_ID = "weekly_cleanup_channel"
         const val NOTIFICATION_ID = 2002
         const val KEY_ITEMS_FOUND = "items_found"
+        /** Minimum clutter count required before the weekly notification is sent. */
+        private const val CLUTTER_NOTIFY_THRESHOLD = 5
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -36,8 +38,7 @@ class WeeklyCleanupWorker(
 
             val totalClutterCount = screenshotCount + blurryCount
 
-            // Threshold is 100 as requested, or > 0 for sample demonstration
-            val shouldNotify = totalClutterCount >= 5 // Allows demonstration in app review/testing
+            val shouldNotify = totalClutterCount >= CLUTTER_NOTIFY_THRESHOLD
 
             if (shouldNotify) {
                 showWeeklyNotification(totalClutterCount, screenshotCount, blurryCount)
