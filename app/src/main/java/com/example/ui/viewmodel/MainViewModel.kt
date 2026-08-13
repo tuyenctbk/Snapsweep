@@ -407,87 +407,28 @@ class MainViewModel(
         val itemsToDelete = _uiState.value.pendingTrash
         if (itemsToDelete.isEmpty()) return
 
-        val sampleItems = itemsToDelete.filter { it.isSample }
-        val realItems = itemsToDelete.filter { !it.isSample }
-
         viewModelScope.launch {
-            // 1. Handle sample items immediately
-            if (sampleItems.isNotEmpty()) {
-                var freedBytes = 0L
-                val records = mutableListOf<CleanupRecordEntity>()
-
-                for (item in sampleItems) {
-                    freedBytes += item.sizeBytes
-                    records.add(
-                        CleanupRecordEntity(
-                            mediaId = item.id,
-                            categoryName = item.category.name,
-                            sizeBytes = item.sizeBytes,
-                            cleanedAtMillis = System.currentTimeMillis()
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                // Android 11+: Use MediaStore.createDeleteRequest to securely prompt user for system permission
+                try {
+                    val uris = itemsToDelete.map { it.uri }
+                    val pendingIntent = android.provider.MediaStore.createDeleteRequest(context.contentResolver, uris)
+                    _uiState.update { state ->
+                        state.copy(
+                            pendingDeleteIntentSender = pendingIntent.intentSender,
+                            pendingDeleteItems = itemsToDelete
                         )
-                    )
-                    // Delete the sample file
-                    try {
-                        item.uri.path?.let { File(it).delete() }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
-                }
-
-                val currentStats = cleanupDao.getUserStats() ?: UserStatsEntity()
-                val newStats = UserStatsEntity(
-                    id = 1,
-                    totalBytesFreed = currentStats.totalBytesFreed + freedBytes,
-                    totalItemsCleaned = currentStats.totalItemsCleaned + sampleItems.size,
-                    lastCleanupMillis = System.currentTimeMillis()
-                )
-
-                cleanupDao.insertCleanupRecords(records)
-                cleanupDao.insertOrUpdateUserStats(newStats)
-
-                _uiState.update { state ->
-                    val remainingTrash = state.pendingTrash.filter { !sampleItems.contains(it) }
-                    state.copy(
-                        pendingTrash = remainingTrash,
-                        userNotification = "Cleaned ${sampleItems.size} sample items"
-                    )
-                }
-            }
-
-            // 2. Handle real items
-            if (realItems.isNotEmpty()) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                    // Android 11+: Use MediaStore.createDeleteRequest to securely prompt user for system permission
-                    try {
-                        val uris = realItems.map { it.uri }
-                        val pendingIntent = android.provider.MediaStore.createDeleteRequest(context.contentResolver, uris)
-                        _uiState.update { state ->
-                            state.copy(
-                                pendingDeleteIntentSender = pendingIntent.intentSender,
-                                pendingDeleteItems = realItems
-                            )
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        // Fallback delete
-                        performDirectDeletion(context, realItems)
-                    }
-                } else {
-                    // Pre-Android 11: delete directly with ContentResolver
-                    performDirectDeletion(context, realItems)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // Fallback delete
+                    performDirectDeletion(context, itemsToDelete)
                 }
             } else {
-                // If there are no real items, we're done!
-                _uiState.update { state ->
-                    state.copy(
-                        showTrashSheet = false,
-                        activeCategory = null,
-                        activeQueue = emptyList()
-                    )
-                }
-                scan(context)
-                onComplete()
+                // Pre-Android 11: delete directly with ContentResolver
+                performDirectDeletion(context, itemsToDelete)
             }
+            onComplete()
         }
     }
 

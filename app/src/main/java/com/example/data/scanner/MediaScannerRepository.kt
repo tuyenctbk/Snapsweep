@@ -34,12 +34,7 @@ class MediaScannerRepository(
         val realItems = queryMediaStore(keptIds)
         onProgress(0.5f)
 
-        if (realItems.isNotEmpty()) {
-            rawItems.addAll(realItems)
-        } else {
-            // Provide realistic offline sample items if MediaStore is empty (e.g. clean emulator)
-            rawItems.addAll(generateSampleItems(context, keptIds))
-        }
+        rawItems.addAll(realItems)
 
         onProgress(0.8f)
         
@@ -233,143 +228,7 @@ class MediaScannerRepository(
         return mediaList
     }
 
-    private fun generateSampleItems(context: Context, keptIds: Set<Long>): List<MediaItem> {
-        val samples = mutableListOf<MediaItem>()
-        val sampleDir = File(context.cacheDir, "sample_photos").apply { mkdirs() }
 
-        val now = System.currentTimeMillis()
-        val fortyDaysAgo = now - (40L * 24 * 60 * 60 * 1000)
-        val oneYearAgo = Calendar.getInstance().apply {
-            add(Calendar.YEAR, -1)
-        }.timeInMillis
-
-        var sampleIdCounter = 1001L
-
-        // Helper to draw sample image file
-        fun createSampleFile(fileName: String, label: String, bgColor: Int, accentColor: Int): Uri {
-            val file = File(sampleDir, fileName)
-            if (!file.exists()) {
-                val bitmap = Bitmap.createBitmap(800, 1000, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(bitmap)
-                canvas.drawColor(bgColor)
-
-                val paint = Paint().apply {
-                    color = accentColor
-                    textSize = 48f
-                    isAntiAlias = true
-                    textAlign = Paint.Align.CENTER
-                }
-                canvas.drawText(label, 400f, 480f, paint)
-
-                val subPaint = Paint().apply {
-                    color = Color.WHITE
-                    textSize = 32f
-                    isAntiAlias = true
-                    textAlign = Paint.Align.CENTER
-                }
-                canvas.drawText("SnapSweep Sample Photo", 400f, 550f, subPaint)
-
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-                }
-                bitmap.recycle()
-            }
-            return Uri.fromFile(file)
-        }
-
-        val sampleConfigs = listOf(
-            // Old Screenshots
-            Triple("screenshot_1.jpg", "📱 Screenshot 2024-03-15", MediaCategory.OLD_SCREENSHOTS),
-            Triple("screenshot_2.jpg", "📱 Order Confirmation #8942", MediaCategory.OLD_SCREENSHOTS),
-            Triple("screenshot_3.jpg", "📱 Text Message Thread", MediaCategory.OLD_SCREENSHOTS),
-            Triple("screenshot_4.jpg", "📱 Map Directions Screen", MediaCategory.OLD_SCREENSHOTS),
-            
-            // Blurry
-            Triple("blurry_1.jpg", "🌁 Out of Focus Motion Shot", MediaCategory.BLURRY_PHOTOS),
-            Triple("blurry_2.jpg", "🌁 Low Light Night Scene", MediaCategory.BLURRY_PHOTOS),
-            Triple("blurry_3.jpg", "🌁 Shaky Moving Subject", MediaCategory.BLURRY_PHOTOS),
-
-            // Similar / Bursts
-            Triple("burst_1.jpg", "👯 Burst Shot #1 (Best)", MediaCategory.SIMILAR_BURSTS),
-            Triple("burst_2.jpg", "👯 Burst Shot #2 (Duplicate)", MediaCategory.SIMILAR_BURSTS),
-            Triple("burst_3.jpg", "👯 Burst Shot #3 (Duplicate)", MediaCategory.SIMILAR_BURSTS),
-            Triple("burst_4.jpg", "👯 Group Selfie #2", MediaCategory.SIMILAR_BURSTS),
-
-            // Receipts & Documents
-            Triple("receipt_1.jpg", "🧾 Target Grocery Receipt", MediaCategory.RECEIPTS_DOCS),
-            Triple("receipt_2.jpg", "🧾 Office Whiteboard Notes", MediaCategory.RECEIPTS_DOCS),
-            Triple("receipt_3.jpg", "🧾 Parking Ticket Stub", MediaCategory.RECEIPTS_DOCS),
-
-            // ML Travel
-            Triple("travel_1.jpg", "✈️ Beach Resort Sunset Shot", MediaCategory.TRAVEL),
-            Triple("travel_2.jpg", "✈️ Mountain Hiking Landmark", MediaCategory.TRAVEL),
-
-            // ML Food
-            Triple("food_1.jpg", "🍕 Plated Artisan Pizza & Coffee", MediaCategory.FOOD),
-            Triple("food_2.jpg", "🍔 Burger & Fries Lunch", MediaCategory.FOOD),
-
-            // ML Pets
-            Triple("pet_1.jpg", "🐶 Golden Retriever Park Portrait", MediaCategory.PETS),
-            Triple("pet_2.jpg", "🐱 Sleeping Tabby Cat", MediaCategory.PETS),
-
-            // Heavy Media
-            Triple("heavy_video_1.jpg", "🎬 4K Beach Sunset Video (180MB)", MediaCategory.HEAVY_MEDIA),
-            Triple("heavy_video_2.jpg", "🎬 Screen Recording 20Mins (240MB)", MediaCategory.HEAVY_MEDIA),
-
-            // On This Day
-            Triple("on_this_day_1.jpg", "📅 Last Year Today Concert", MediaCategory.ON_THIS_DAY),
-            Triple("on_this_day_2.jpg", "📅 Last Year Today Lunch", MediaCategory.ON_THIS_DAY)
-        )
-
-        val colors = listOf(
-            Color.parseColor("#1E293B") to Color.parseColor("#38BDF8"),
-            Color.parseColor("#0F172A") to Color.parseColor("#F59E0B"),
-            Color.parseColor("#172554") to Color.parseColor("#8B5CF6"),
-            Color.parseColor("#064E3B") to Color.parseColor("#10B981"),
-            Color.parseColor("#4C0519") to Color.parseColor("#EF4444"),
-            Color.parseColor("#831843") to Color.parseColor("#EC4899")
-        )
-
-        for ((index, config) in sampleConfigs.withIndex()) {
-            val id = sampleIdCounter++
-            if (keptIds.contains(id)) continue
-
-            val (fileName, title, category) = config
-            val colorPair = colors[index % colors.size]
-            val uri = createSampleFile(fileName, title, colorPair.first, colorPair.second)
-
-            val size = when (category) {
-                MediaCategory.HEAVY_MEDIA -> (120L + (index * 60L)) * 1024 * 1024
-                MediaCategory.OLD_SCREENSHOTS -> (2L + index) * 1024 * 1024
-                MediaCategory.RECEIPTS_DOCS -> (1L + index) * 1024 * 512
-                else -> (3L + index) * 1024 * 1024
-            }
-
-            val dateTaken = when (category) {
-                MediaCategory.OLD_SCREENSHOTS -> fortyDaysAgo - (index * 86400000L)
-                MediaCategory.ON_THIS_DAY -> oneYearAgo
-                else -> now - (index * 3600000L)
-            }
-
-            samples.add(
-                MediaItem(
-                    id = id,
-                    uri = uri,
-                    title = title,
-                    sizeBytes = size,
-                    dateTakenMillis = dateTaken,
-                    category = category,
-                    width = 800,
-                    height = 1000,
-                    blurScore = if (category == MediaCategory.BLURRY_PHOTOS) 24.5f else 150.0f,
-                    isVideo = category == MediaCategory.HEAVY_MEDIA,
-                    isSample = true
-                )
-            )
-        }
-
-        return samples
-    }
 
     private fun loadThumbnail(context: Context, uri: Uri): Bitmap? {
         return try {

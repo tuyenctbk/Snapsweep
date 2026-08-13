@@ -1,4 +1,5 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
+import java.util.Properties
 
 plugins {
   alias(libs.plugins.android.application)
@@ -9,30 +10,38 @@ plugins {
   alias(libs.plugins.google.services)
 }
 
+val localProperties = Properties().apply {
+  val localPropertiesFile = rootProject.file("local.properties")
+  if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { load(it) }
+  }
+}
+
 android {
   namespace = "com.example"
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.snapsweep.cleaner"
+    applicationId = "com.soloprono.snapsweep"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 2
+    versionName = "1.2"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      val keystoreFile = localProperties.getProperty("RELEASE_STORE_FILE") ?: "common_release_key.jks"
+      storeFile = rootProject.file(keystoreFile)
+      storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: "dpadhero123"
+      keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: "dpad_hero_alias"
+      keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: "dpadhero123"
     }
     create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
+      val projectDebugKeystore = file("${rootDir}/debug.keystore")
+      storeFile = if (projectDebugKeystore.exists()) projectDebugKeystore else file("${System.getProperty("user.home")}/.android/debug.keystore")
       storePassword = "android"
       keyAlias = "androiddebugkey"
       keyPassword = "android"

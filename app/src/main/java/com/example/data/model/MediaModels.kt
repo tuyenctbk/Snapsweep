@@ -89,8 +89,7 @@ data class MediaItem(
     val hash: String = "",
     val isVideo: Boolean = false,
     val isPendingTrash: Boolean = false,
-    val isKept: Boolean = false,
-    val isSample: Boolean = false
+    val isKept: Boolean = false
 ) {
     val formattedSize: String
         get() {

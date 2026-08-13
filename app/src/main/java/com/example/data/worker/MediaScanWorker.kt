@@ -227,7 +227,7 @@ class MediaScanWorker(
                 // Convert to hex string
                 digest.digest().joinToString("") { "%02x".format(it) }
             } else {
-                // Fallback for file scheme / sample items
+                // Fallback for file scheme URIs
                 val file = uri.path?.let { File(it) }
                 if (file != null && file.exists()) {
                     file.inputStream().use { stream ->
