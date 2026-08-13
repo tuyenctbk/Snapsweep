@@ -44,6 +44,7 @@ import com.example.ui.theme.DarkBorder
 import com.example.ui.theme.DarkSurface
 import com.example.ui.theme.DarkSurfaceVariant
 import com.example.ui.theme.EmeraldKeep
+import com.example.ui.theme.LightBackground
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
@@ -91,13 +92,23 @@ fun StorageHeader(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(24.dp))
                 .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF1E293B),
-                            Color(0xFF0F172A),
-                            Color(0xFF1E1B4B)
+                    if (MaterialTheme.colorScheme.background == LightBackground) {
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFFF1F5F9),
+                                Color(0xFFE2E8F0),
+                                Color(0xFFEDE9FE)
+                            )
                         )
-                    )
+                    } else {
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF1E293B),
+                                Color(0xFF0F172A),
+                                Color(0xFF1E1B4B)
+                            )
+                        )
+                    }
                 )
                 .border(1.dp, Brush.horizontalGradient(listOf(CyanPrimary.copy(alpha = 0.5f), DarkBorder)), RoundedCornerShape(24.dp))
                 .padding(20.dp)

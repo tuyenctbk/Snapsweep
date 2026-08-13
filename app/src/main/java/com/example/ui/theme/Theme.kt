@@ -20,13 +20,13 @@ private val SnapSweepDarkColorScheme = darkColorScheme(
     onSecondary = Color.Black,
     tertiary = RoseTrash,
     onTertiary = Color.White,
-    background = DarkBackground,
-    onBackground = TextPrimary,
-    surface = DarkSurface,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = TextSecondary,
-    outline = DarkBorder
+    background = DarkBackgroundPalette,
+    onBackground = DarkTextPrimary,
+    surface = DarkSurfacePalette,
+    onSurface = DarkTextPrimary,
+    surfaceVariant = DarkSurfaceVariantPalette,
+    onSurfaceVariant = DarkTextSecondary,
+    outline = DarkBorderPalette
 )
 
 private val SnapSweepLightColorScheme = lightColorScheme(
@@ -66,4 +66,3 @@ fun SnapSweepTheme(
         content = content
     )
 }
-
