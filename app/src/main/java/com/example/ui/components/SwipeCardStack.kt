@@ -1,5 +1,8 @@
 package com.example.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.example.R
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -26,16 +29,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.RotateLeft
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,10 +77,21 @@ import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.FilterList
 
 @Composable
 fun SwipeCardStack(
@@ -81,13 +102,21 @@ fun SwipeCardStack(
     onUndo: () -> Unit,
     onZoom: (MediaItem) -> Unit,
     canUndo: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onScanAgain: (() -> Unit)? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
 
     if (currentIndex >= items.size) {
-        // Queue Completed State
+        // Queue Completed State with Lottie Animation
+        val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.clean_sweep))
+        val lottieProgress by animateLottieCompositionAsState(
+            composition = lottieComposition,
+            iterations = 100
+        )
+
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -98,27 +127,30 @@ fun SwipeCardStack(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // Beautiful Lottie Clean Sweep illustration
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(160.dp)
                         .clip(CircleShape)
-                        .background(EmeraldKeep.copy(alpha = 0.2f)),
+                        .background(CyanPrimary.copy(alpha = 0.08f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Complete",
-                        tint = EmeraldKeep,
-                        modifier = Modifier.size(48.dp)
+                    LottieAnimation(
+                        composition = lottieComposition,
+                        progress = { lottieProgress },
+                        modifier = Modifier.size(130.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Category Queue Swept!",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = TextPrimary
+                    text = "ALL CLEAN!",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    ),
+                    color = CyanPrimary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -129,13 +161,41 @@ fun SwipeCardStack(
                     color = TextSecondary
                 )
 
+                if (onScanAgain != null) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = { onScanAgain() },
+                        colors = ButtonDefaults.buttonColors(containerColor = CyanPrimary),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.testTag("scan_again_button_completed")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Scan Library Again",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                color = Color.Black
+                            )
+                        )
+                    }
+                }
+
                 if (canUndo) {
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .background(DarkSurfaceVariant)
-                            .clickable { onUndo() }
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onUndo()
+                            }
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -160,6 +220,16 @@ fun SwipeCardStack(
 
     val currentItem = items[currentIndex]
     val nextItem = items.getOrNull(currentIndex + 1)
+
+    var showLottieFeedback by remember { mutableStateOf(false) }
+
+    androidx.compose.runtime.LaunchedEffect(currentIndex) {
+        if (currentIndex > 0) {
+            showLottieFeedback = true
+            delay(750)
+            showLottieFeedback = false
+        }
+    }
 
     val offsetX = remember(currentIndex) { Animatable(0f) }
     val offsetY = remember(currentIndex) { Animatable(0f) }
@@ -205,12 +275,14 @@ fun SwipeCardStack(
                             onDragEnd = {
                                 if (offsetX.value > swipeThreshold) {
                                     // Swipe Right (Keep)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     coroutineScope.launch {
                                         offsetX.animateTo(1000f, tween(200))
                                         onSwipeRight(currentItem)
                                     }
                                 } else if (offsetX.value < -swipeThreshold) {
                                     // Swipe Left (Trash)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     coroutineScope.launch {
                                         offsetX.animateTo(-1000f, tween(200))
                                         onSwipeLeft(currentItem)
@@ -247,7 +319,7 @@ fun SwipeCardStack(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "KEEP 💚",
+                        text = stringResource(R.string.keep),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Black,
                             color = Color.Black
@@ -266,7 +338,7 @@ fun SwipeCardStack(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "TRASH 🗑️",
+                        text = stringResource(R.string.trash),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Black,
                             color = Color.White
@@ -274,15 +346,69 @@ fun SwipeCardStack(
                     )
                 }
             }
+
+            // Beautiful Lottie Sweep Sparkle feedback overlay
+            if (showLottieFeedback) {
+                val feedComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.clean_sweep))
+                val feedProgress by animateLottieCompositionAsState(
+                    composition = feedComposition,
+                    isPlaying = true
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.Black.copy(alpha = 0.25f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieAnimation(
+                        composition = feedComposition,
+                        progress = { feedProgress },
+                        modifier = Modifier.size(180.dp)
+                    )
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // Floating Recently Deleted / Undo Pill Notification
+        if (canUndo) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp, vertical = 4.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(DarkSurfaceVariant)
+                    .border(1.dp, CyanPrimary.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onUndo()
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Undo,
+                        contentDescription = "Undo",
+                        tint = CyanPrimary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.item_moved_to_trash),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = CyanPrimary
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         // Action Buttons Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+                .padding(horizontal = 24.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -293,7 +419,10 @@ fun SwipeCardStack(
                     .clip(CircleShape)
                     .background(if (canUndo) DarkSurfaceVariant else DarkSurface)
                     .border(1.dp, if (canUndo) CyanPrimary else DarkBorder, CircleShape)
-                    .clickable(enabled = canUndo) { onUndo() }
+                    .clickable(enabled = canUndo) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onUndo()
+                    }
                     .testTag("undo_button"),
                 contentAlignment = Alignment.Center
             ) {
@@ -312,6 +441,7 @@ fun SwipeCardStack(
                     .clip(CircleShape)
                     .background(RoseTrash)
                     .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         coroutineScope.launch {
                             offsetX.animateTo(-1000f, tween(200))
                             onSwipeLeft(currentItem)
@@ -335,7 +465,10 @@ fun SwipeCardStack(
                     .clip(CircleShape)
                     .background(DarkSurfaceVariant)
                     .border(1.dp, DarkBorder, CircleShape)
-                    .clickable { onZoom(currentItem) }
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onZoom(currentItem)
+                    }
                     .testTag("zoom_button"),
                 contentAlignment = Alignment.Center
             ) {
@@ -354,6 +487,7 @@ fun SwipeCardStack(
                     .clip(CircleShape)
                     .background(EmeraldKeep)
                     .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         coroutineScope.launch {
                             offsetX.animateTo(1000f, tween(200))
                             onSwipeRight(currentItem)
@@ -379,9 +513,32 @@ fun MediaCardView(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    var showMetadataOverlay by remember(item.id) { mutableStateOf(false) }
     val dateStr = remember(item.dateTakenMillis) {
         val sdf = SimpleDateFormat("MMM dd, yyyy • h:mm a", Locale.getDefault())
         sdf.format(Date(item.dateTakenMillis))
+    }
+
+    val dateBucket = remember(item.dateTakenMillis) {
+        val now = System.currentTimeMillis()
+        val diffDays = (now - item.dateTakenMillis) / (1000 * 60 * 60 * 24)
+        when {
+            diffDays <= 0 -> "📅 Today"
+            diffDays <= 1 -> "📅 Yesterday"
+            diffDays <= 7 -> "🗓️ This Week"
+            diffDays <= 30 -> "🗓️ This Month"
+            else -> "🗓️ Older"
+        }
+    }
+
+    val appOrigin = remember(item.title, item.category) {
+        when {
+            item.category == MediaCategory.OLD_SCREENSHOTS || item.title.contains("screenshot", ignoreCase = true) -> "📱 Screenshot"
+            item.title.contains("WA", ignoreCase = true) || item.title.contains("WhatsApp", ignoreCase = true) -> "💬 WhatsApp / Social"
+            item.title.contains("IMG", ignoreCase = true) || item.title.contains("PXL", ignoreCase = true) -> "📸 Camera Roll"
+            item.isVideo -> "🎥 Video Media"
+            else -> "📁 Media Gallery"
+        }
     }
 
     Card(
@@ -409,44 +566,101 @@ fun MediaCardView(
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Black.copy(alpha = 0.7f), Color.Transparent)
+                            colors = listOf(Color.Black.copy(alpha = 0.75f), Color.Transparent)
                         )
                     )
                     .padding(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(item.category.badgeColorHex))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = item.category.title,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(item.category.badgeColorHex))
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = stringResource(item.category.titleResId),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
                             )
-                        )
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color.Black.copy(alpha = 0.6f))
+                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = item.formattedSize,
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = CyanPrimary
+                                    )
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { showMetadataOverlay = !showMetadataOverlay },
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.Black.copy(alpha = 0.6f))
+                                    .testTag("info_icon_overlay_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "Show Info",
+                                    tint = CyanPrimary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color.Black.copy(alpha = 0.6f))
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Origin & Date Bucket Badges
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = item.formattedSize,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = CyanPrimary
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Black.copy(alpha = 0.65f))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = appOrigin,
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                                color = Color.White
                             )
-                        )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Black.copy(alpha = 0.65f))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = dateBucket,
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
@@ -500,6 +714,94 @@ fun MediaCardView(
                     }
                 }
             }
+
+            // Translucent Metadata overlay card
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showMetadataOverlay,
+                enter = androidx.compose.animation.fadeIn(),
+                exit = androidx.compose.animation.fadeOut(),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.85f))
+                        .clickable { showMetadataOverlay = false }
+                        .padding(20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(DarkSurface)
+                            .border(1.dp, DarkBorder, RoundedCornerShape(16.dp))
+                            .clickable(enabled = false) {} // Prevent click-through closing the overlay
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.media_properties),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = CyanPrimary
+                            )
+                            IconButton(
+                                onClick = { showMetadataOverlay = false },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.close),
+                                    tint = TextMuted,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        MetadataItemRow(label = stringResource(R.string.filename), value = item.title)
+                        MetadataItemRow(label = stringResource(R.string.path), value = item.uri.path ?: item.uri.toString())
+                        MetadataItemRow(label = stringResource(R.string.date_taken), value = dateStr)
+                        
+                        val resolution = if (item.width > 0 && item.height > 0) "${item.width} x ${item.height}" else stringResource(R.string.unknown)
+                        MetadataItemRow(label = stringResource(R.string.resolution), value = resolution)
+                        
+                        MetadataItemRow(label = stringResource(R.string.file_size), value = item.formattedSize)
+                        MetadataItemRow(label = stringResource(R.string.category), value = stringResource(item.category.titleResId))
+                        
+                        if (item.blurScore > 0f) {
+                            MetadataItemRow(label = stringResource(R.string.blur_metric), value = String.format("%.2f", item.blurScore))
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun MetadataItemRow(label: String, value: String) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp
+            ),
+            color = TextMuted
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall,
+            color = TextPrimary,
+            maxLines = 2,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+        )
     }
 }

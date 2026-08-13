@@ -55,13 +55,15 @@ import com.example.ui.theme.CyanPrimary
 import com.example.ui.theme.EmeraldKeep
 import com.example.ui.theme.PurpleAccent
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import com.example.R
 
 data class OnboardingPageData(
-    val title: String,
-    val subtitle: String,
+    val titleRes: Int,
+    val subtitleRes: Int,
     val icon: ImageVector,
     val accentColor: Color,
-    val badgeText: String,
+    val badgeTextRes: Int,
     val isPermissionPage: Boolean = false
 )
 
@@ -76,32 +78,32 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPageData(
-            title = "Reclaim Storage in Seconds",
-            subtitle = "SnapSweep automatically detects blurry photos, old screenshots, duplicate bursts, and massive videos.",
+            titleRes = R.string.onboarding_title_1,
+            subtitleRes = R.string.onboarding_sub_1,
             icon = Icons.Default.CleaningServices,
             accentColor = CyanPrimary,
-            badgeText = "SMART AI CLEANER"
+            badgeTextRes = R.string.onboarding_badge_1
         ),
         OnboardingPageData(
-            title = "100% On-Device & Private",
-            subtitle = "Your photos and private memories never leave your phone. All image analysis and hashing run strictly offline.",
+            titleRes = R.string.onboarding_title_2,
+            subtitleRes = R.string.onboarding_sub_2,
             icon = Icons.Default.Security,
             accentColor = EmeraldKeep,
-            badgeText = "ZERO CLOUD UPLOADS"
+            badgeTextRes = R.string.onboarding_badge_2
         ),
         OnboardingPageData(
-            title = "Swipe Left to Trash, Right to Keep",
-            subtitle = "Reviewing clutter is as easy as swiping. Trash items safely enter a review queue before permanent deletion.",
+            titleRes = R.string.onboarding_title_3,
+            subtitleRes = R.string.onboarding_sub_3,
             icon = Icons.Default.Swipe,
             accentColor = PurpleAccent,
-            badgeText = "FAST SWIPE CLEANUP"
+            badgeTextRes = R.string.onboarding_badge_3
         ),
         OnboardingPageData(
-            title = "Secure Storage Access",
-            subtitle = "To analyze blurry photos, duplicates, and screenshots offline, SnapSweep needs safe local reading permission.",
+            titleRes = R.string.onboarding_title_4,
+            subtitleRes = R.string.onboarding_sub_4,
             icon = Icons.Default.CleaningServices,
             accentColor = CyanPrimary,
-            badgeText = "STORAGE PERMISSION",
+            badgeTextRes = R.string.onboarding_badge_4,
             isPermissionPage = true
         )
     )
@@ -169,7 +171,7 @@ fun OnboardingScreen(
                             modifier = Modifier.testTag("skip_onboarding_button")
                         ) {
                             Text(
-                                text = "Skip",
+                                text = stringResource(R.string.skip),
                                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -242,7 +244,7 @@ fun OnboardingScreen(
                                 shape = RoundedCornerShape(14.dp)
                             ) {
                                 Text(
-                                    text = "Back",
+                                    text = stringResource(R.string.back),
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -273,7 +275,7 @@ fun OnboardingScreen(
                             shape = RoundedCornerShape(14.dp)
                         ) {
                             Text(
-                                text = if (isLastPage) "Get Started" else "Next",
+                                text = if (isLastPage) stringResource(R.string.get_started) else stringResource(R.string.next),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                             )
                         }
@@ -322,7 +324,7 @@ private fun OnboardingPageCard(
                 border = androidx.compose.foundation.BorderStroke(1.dp, page.accentColor.copy(alpha = 0.4f))
             ) {
                 Text(
-                    text = page.badgeText,
+                    text = stringResource(page.badgeTextRes),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -363,7 +365,7 @@ private fun OnboardingPageCard(
 
             // Title
             Text(
-                text = page.title,
+                text = stringResource(page.titleRes),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = if (isWideScreen) 22.sp else 24.sp
@@ -376,7 +378,7 @@ private fun OnboardingPageCard(
 
             // Subtitle
             Text(
-                text = page.subtitle,
+                text = stringResource(page.subtitleRes),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 15.sp,
                     lineHeight = 22.sp
@@ -410,7 +412,7 @@ private fun OnboardingPageCard(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = "Access Approved ✓",
+                                text = stringResource(R.string.access_approved),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = EmeraldKeep
@@ -440,7 +442,7 @@ private fun OnboardingPageCard(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Grant Storage Access",
+                            text = stringResource(R.string.grant_storage_access),
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                     }

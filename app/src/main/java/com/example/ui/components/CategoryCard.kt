@@ -44,6 +44,9 @@ import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 
+import androidx.compose.ui.res.stringResource
+import com.example.R
+
 @Composable
 fun CategoryCard(
     summary: CategorySummary,
@@ -82,7 +85,7 @@ fun CategoryCard(
                     ) {
                         Icon(
                             imageVector = category.icon,
-                            contentDescription = category.title,
+                            contentDescription = stringResource(category.titleResId),
                             tint = badgeColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -92,14 +95,14 @@ fun CategoryCard(
 
                     Column {
                         Text(
-                            text = category.title,
+                            text = stringResource(category.titleResId),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold
                             ),
                             color = TextPrimary
                         )
                         Text(
-                            text = category.description,
+                            text = stringResource(category.descriptionResId),
                             style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
@@ -130,7 +133,7 @@ fun CategoryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${summary.count} items pending",
+                    text = stringResource(R.string.items_pending, summary.count),
                     style = MaterialTheme.typography.labelMedium,
                     color = TextMuted
                 )
@@ -154,13 +157,13 @@ fun CategoryCard(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "SWIPE CLEAN",
+                            text = stringResource(R.string.swipe_clean_btn),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                         )
                     }
                 } else {
                     Text(
-                        text = "Clean! ✨",
+                        text = stringResource(R.string.clean_status),
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = EmeraldKeep
                     )

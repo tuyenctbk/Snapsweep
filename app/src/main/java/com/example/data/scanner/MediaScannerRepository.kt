@@ -130,19 +130,20 @@ class MediaScannerRepository(
 
                 var finalBlurScore = 150f
                 var isSimilar = false
+                var mlCategory: MediaCategory? = null
 
                 val category = when {
                     isOnThisDay -> MediaCategory.ON_THIS_DAY
                     isScreenshot && dateTaken < thirtyDaysAgo -> MediaCategory.OLD_SCREENSHOTS
                     isScreenshot -> null // Skip recent screenshots from being flagged for cleanup
-                    name.contains("receipt", ignoreCase = true) || name.contains("doc", ignoreCase = true) || name.contains("paper", ignoreCase = true) -> MediaCategory.RECEIPTS_DOCS
                     size > 50 * 1024 * 1024 -> MediaCategory.HEAVY_MEDIA
                     else -> {
-                        // For other photos, perform real-time local image analysis to detect actual blurry or duplicate items
+                        // Perform real-time local image analysis & ML classification
                         val thumb = loadThumbnail(context, contentUri)
                         if (thumb != null) {
                             finalBlurScore = ImageAnalyzer.calculateBlurScore(thumb)
                             val hash = ImageAnalyzer.computePerceptualHash(thumb)
+                            mlCategory = ImageAnalyzer.classifySmartCategory(thumb, name)
 
                             // Check duplicates (taken within 15 seconds, low Hamming distance)
                             val match = previousHashes.firstOrNull { (prevHash, prevTime) ->
@@ -162,7 +163,9 @@ class MediaScannerRepository(
                         when {
                             isSimilar -> MediaCategory.SIMILAR_BURSTS
                             finalBlurScore < 40f -> MediaCategory.BLURRY_PHOTOS
-                            else -> null // Healthy & unique photo. Do not flag for deletion.
+                            mlCategory != null -> mlCategory
+                            name.contains("receipt", ignoreCase = true) || name.contains("doc", ignoreCase = true) -> MediaCategory.RECEIPTS_DOCS
+                            else -> null
                         }
                     }
                 }
@@ -296,6 +299,18 @@ class MediaScannerRepository(
             Triple("receipt_1.jpg", "🧾 Target Grocery Receipt", MediaCategory.RECEIPTS_DOCS),
             Triple("receipt_2.jpg", "🧾 Office Whiteboard Notes", MediaCategory.RECEIPTS_DOCS),
             Triple("receipt_3.jpg", "🧾 Parking Ticket Stub", MediaCategory.RECEIPTS_DOCS),
+
+            // ML Travel
+            Triple("travel_1.jpg", "✈️ Beach Resort Sunset Shot", MediaCategory.TRAVEL),
+            Triple("travel_2.jpg", "✈️ Mountain Hiking Landmark", MediaCategory.TRAVEL),
+
+            // ML Food
+            Triple("food_1.jpg", "🍕 Plated Artisan Pizza & Coffee", MediaCategory.FOOD),
+            Triple("food_2.jpg", "🍔 Burger & Fries Lunch", MediaCategory.FOOD),
+
+            // ML Pets
+            Triple("pet_1.jpg", "🐶 Golden Retriever Park Portrait", MediaCategory.PETS),
+            Triple("pet_2.jpg", "🐱 Sleeping Tabby Cat", MediaCategory.PETS),
 
             // Heavy Media
             Triple("heavy_video_1.jpg", "🎬 4K Beach Sunset Video (180MB)", MediaCategory.HEAVY_MEDIA),

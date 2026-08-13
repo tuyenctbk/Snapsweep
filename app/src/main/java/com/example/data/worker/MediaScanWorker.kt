@@ -39,6 +39,14 @@ class MediaScanWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            // Check Power Saving Mode (< 20% battery and not charging)
+            if (isLowBattery(appContext)) {
+                showPowerSavingNotification()
+                return@withContext Result.success(
+                    workDataOf("power_saving_paused" to true)
+                )
+            }
+
             val cleanupDao = AppDatabase.getInstance(appContext).cleanupDao()
             val keptIds = cleanupDao.getAllKeptMediaIds().toSet()
 
@@ -265,6 +273,50 @@ class MediaScanWorker(
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("SnapSweep Background Scan")
             .setContentText(contentText)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .build()
+
+        try {
+            manager.notify(NOTIFICATION_ID, notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun isLowBattery(context: Context): Boolean {
+        val batteryStatus: android.content.Intent? = android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED).let { filter ->
+            context.registerReceiver(null, filter)
+        }
+        val level: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
+        if (level < 0 || scale <= 0) return false
+        val batteryPct: Float = level * 100 / scale.toFloat()
+
+        val status: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val isCharging: Boolean = status == android.os.BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == android.os.BatteryManager.BATTERY_STATUS_FULL
+
+        return batteryPct < 20f && !isCharging
+    }
+
+    private fun showPowerSavingNotification() {
+        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            ?: return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Media Scan Service",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            manager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(appContext, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle("SnapSweep Power Saving")
+            .setContentText("Background scan paused to conserve power (battery < 20%)")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .build()

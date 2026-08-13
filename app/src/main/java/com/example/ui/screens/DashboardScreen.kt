@@ -72,8 +72,16 @@ import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 
+import com.example.ui.components.BulkCleanDialog
 import com.example.ui.components.ShareAppCard
+import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Settings
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material3.Surface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,6 +97,8 @@ fun DashboardScreen(
     isWorkerRunning: Boolean = false,
     taggedCount: Int = 0,
     bgWorkerMessage: String? = null,
+    showBulkCleanDialog: Boolean = false,
+    cleanupStreakDays: Int = 3,
     onRunBackgroundWorker: () -> Unit = {},
     onRequestPermission: () -> Unit = {},
     onRefreshScan: () -> Unit,
@@ -96,6 +106,10 @@ fun DashboardScreen(
     onOpenTrashSheet: () -> Unit,
     onClearNotification: () -> Unit,
     onOpenSettings: () -> Unit = {},
+    onOpenMonthlyReport: () -> Unit = {},
+    onOpenBulkCleanDialog: () -> Unit = {},
+    onConfirmBulkClean: () -> Unit = {},
+    onDismissBulkCleanDialog: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -106,6 +120,12 @@ fun DashboardScreen(
             onClearNotification()
         }
     }
+
+    val screenshotsSummary = categories.firstOrNull { it.category == MediaCategory.OLD_SCREENSHOTS }
+    val blurrySummary = categories.firstOrNull { it.category == MediaCategory.BLURRY_PHOTOS }
+
+    val bulkCleanItemCount = (screenshotsSummary?.count ?: 0) + (blurrySummary?.count ?: 0)
+    val bulkCleanBytes = (screenshotsSummary?.totalSizeBytes ?: 0L) + (blurrySummary?.totalSizeBytes ?: 0L)
 
     val onThisDaySummary = categories.firstOrNull { it.category == MediaCategory.ON_THIS_DAY }
     val standardCategories = categories.filter { it.category != MediaCategory.ON_THIS_DAY }
@@ -381,6 +401,16 @@ fun DashboardScreen(
                         )
                     }
 
+                    // Cleanup Streak Tracker Card
+                    item {
+                        CleanupStreakCard(streakDays = cleanupStreakDays)
+                    }
+
+                    // Monthly Report Card
+                    item {
+                        MonthlyReportCard(onOpenReport = onOpenMonthlyReport)
+                    }
+
                     // Gallery Permission Status / Request Card
                     item {
                         GalleryPermissionCard(
@@ -397,6 +427,90 @@ fun DashboardScreen(
                                 summary = onThisDaySummary,
                                 onCleanClick = { onOpenCategory(MediaCategory.ON_THIS_DAY) }
                             )
+                        }
+                    }
+
+                    // Bulk Clean Quick Action Card if items exist
+                    if (bulkCleanItemCount > 0) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(
+                                                Color(0xFF881337),
+                                                Color(0xFF4C0519),
+                                                Color(0xFF0F172A)
+                                            )
+                                        )
+                                    )
+                                    .border(1.dp, RoseTrash.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                                    .clickable { onOpenBulkCleanDialog() }
+                                    .padding(18.dp)
+                                    .testTag("bulk_clean_quick_action")
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(CircleShape)
+                                                .background(RoseTrash.copy(alpha = 0.2f)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.DeleteSweep,
+                                                contentDescription = "Bulk Clean",
+                                                tint = RoseTrash,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column {
+                                            Text(
+                                                text = "ONE-TAP BULK CLEAN",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    letterSpacing = 1.sp
+                                                ),
+                                                color = RoseTrash
+                                            )
+                                            Text(
+                                                text = "Bulk Delete $bulkCleanItemCount Junk Photos",
+                                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                                color = Color.White
+                                            )
+                                            Text(
+                                                text = "Screenshots & blurry photos detected",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = Color.LightGray
+                                            )
+                                        }
+                                    }
+
+                                    Button(
+                                        onClick = onOpenBulkCleanDialog,
+                                        colors = ButtonDefaults.buttonColors(containerColor = RoseTrash),
+                                        shape = RoundedCornerShape(12.dp),
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(
+                                            text = "CLEAN NOW",
+                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black),
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -484,6 +598,18 @@ fun DashboardScreen(
                     }
                 }
             }
+        }
+
+        // Render Bulk Clean Confirmation Dialog if triggered
+        if (showBulkCleanDialog) {
+            BulkCleanDialog(
+                screenshotsCount = screenshotsSummary?.count ?: 0,
+                screenshotsSize = screenshotsSummary?.totalSizeBytes ?: 0L,
+                blurryCount = blurrySummary?.count ?: 0,
+                blurrySize = blurrySummary?.totalSizeBytes ?: 0L,
+                onConfirmBulkClean = onConfirmBulkClean,
+                onDismiss = onDismissBulkCleanDialog
+            )
         }
     }
 }
@@ -579,6 +705,168 @@ fun OnThisDayCard(
                 Text(
                     text = "REVIEW ${summary.count} MEMORIES",
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CleanupStreakCard(
+    streakDays: Int,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        border = BorderStroke(
+            1.dp,
+            Brush.horizontalGradient(
+                colors = listOf(Color(0xFFF97316), CyanPrimary)
+            )
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("cleanup_streak_card")
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF97316).copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocalFireDepartment,
+                        contentDescription = "Streak Fire",
+                        tint = Color(0xFFF97316),
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "$streakDays DAY CLEANUP STREAK",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = Color(0xFFF97316)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = if (streakDays > 1) "Awesome! Keep swiping daily to maintain gallery health." else "Clean today to start your daily streak!",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                val activeDots = streakDays.coerceAtMost(5)
+                for (i in 1..5) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (i <= activeDots) Color(0xFFF97316) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MonthlyReportCard(
+    onOpenReport: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            1.dp,
+            Brush.horizontalGradient(
+                colors = listOf(CyanPrimary, Color(0xFF3B82F6))
+            )
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onOpenReport() }
+            .testTag("monthly_report_card")
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(CyanPrimary.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.EmojiEvents,
+                        contentDescription = "Monthly Report",
+                        tint = CyanPrimary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "MONTHLY CLEANUP REPORT",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "View storage saved & share your progress card",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = onOpenReport,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = CyanPrimary,
+                    contentColor = Color.Black
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.height(36.dp)
+            ) {
+                Text(
+                    text = "VIEW",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
         }

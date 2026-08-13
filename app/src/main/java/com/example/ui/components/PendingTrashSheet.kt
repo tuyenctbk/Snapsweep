@@ -52,6 +52,8 @@ import com.example.ui.theme.RoseTrash
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.example.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -212,7 +214,7 @@ fun PendingTrashSheet(
                                         maxLines = 1
                                     )
                                     Text(
-                                        text = "${item.category.title} • ${item.formattedSize}",
+                                        text = "${stringResource(item.category.titleResId)} • ${item.formattedSize}",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = TextSecondary
                                     )

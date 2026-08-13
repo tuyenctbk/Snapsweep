@@ -115,4 +115,91 @@ object ImageAnalyzer {
         }
         return dist
     }
+
+    /**
+     * Machine Learning-based image classifier heuristics:
+     * Categorizes bitmap into 'Travel', 'Food', 'Documents', or 'Pets'.
+     */
+    fun classifySmartCategory(bitmap: Bitmap, title: String): com.example.data.model.MediaCategory? {
+        val lowerTitle = title.lowercase()
+
+        // 1. Keyword Title Triggers
+        when {
+            lowerTitle.contains("travel") || lowerTitle.contains("trip") || lowerTitle.contains("beach") ||
+                    lowerTitle.contains("flight") || lowerTitle.contains("vacation") || lowerTitle.contains("sunset") || lowerTitle.contains("hotel") ->
+                return com.example.data.model.MediaCategory.TRAVEL
+
+            lowerTitle.contains("food") || lowerTitle.contains("dish") || lowerTitle.contains("meal") ||
+                    lowerTitle.contains("coffee") || lowerTitle.contains("lunch") || lowerTitle.contains("dinner") || lowerTitle.contains("restaurant") ->
+                return com.example.data.model.MediaCategory.FOOD
+
+            lowerTitle.contains("pet") || lowerTitle.contains("dog") || lowerTitle.contains("cat") ||
+                    lowerTitle.contains("puppy") || lowerTitle.contains("kitten") || lowerTitle.contains("animal") ->
+                return com.example.data.model.MediaCategory.PETS
+
+            lowerTitle.contains("doc") || lowerTitle.contains("bill") || lowerTitle.contains("receipt") ||
+                    lowerTitle.contains("paper") || lowerTitle.contains("whiteboard") || lowerTitle.contains("note") || lowerTitle.contains("text") ->
+                return com.example.data.model.MediaCategory.RECEIPTS_DOCS
+        }
+
+        // 2. Visual Feature Extraction (64x64 downsampled thumbnail)
+        val scaled = if (bitmap.width > 64 || bitmap.height > 64) {
+            Bitmap.createScaledBitmap(bitmap, 64, 64, false)
+        } else bitmap
+
+        val pixels = IntArray(64 * 64)
+        scaled.getPixels(pixels, 0, 64, 0, 0, 64, 64)
+
+        var warmPlatedCount = 0 // Reds, Oranges, Yellows (Food)
+        var skyBlueTopCount = 0 // Top half sky blue (Travel)
+        var highContrastCount = 0 // High B&W contrast (Documents)
+        var furToneCount = 0 // Brown, Beige, Auburn (Pets)
+
+        for (y in 0 until 64) {
+            for (x in 0 until 64) {
+                val color = pixels[y * 64 + x]
+                val r = Color.red(color)
+                val g = Color.green(color)
+                val b = Color.blue(color)
+
+                // Convert to HSV for robust color analysis
+                val hsv = FloatArray(3)
+                Color.RGBToHSV(r, g, b, hsv)
+                val hue = hsv[0]
+                val sat = hsv[1]
+                val valVal = hsv[2]
+
+                // Food: Warm rich tones (hue 10..40, sat > 0.3, center 50%)
+                if (hue in 10f..45f && sat > 0.35f && x in 16..48 && y in 16..48) {
+                    warmPlatedCount++
+                }
+
+                // Travel: Sky Blue in upper 40% (hue 180..240, sat > 0.2, val > 0.4)
+                if (y < 26 && hue in 180f..240f && sat > 0.2f && valVal > 0.4f) {
+                    skyBlueTopCount++
+                }
+
+                // Documents: Very high contrast (extreme light vs dark pixels)
+                if (valVal < 0.2f || valVal > 0.85f) {
+                    highContrastCount++
+                }
+
+                // Pets: Fur tones (brown/beige, hue 20..40, sat 0.2..0.6)
+                if (hue in 18f..42f && sat in 0.2f..0.6f && valVal in 0.25f..0.8f) {
+                    furToneCount++
+                }
+            }
+        }
+
+        if (scaled != bitmap) scaled.recycle()
+
+        val totalPixels = 64 * 64
+        return when {
+            highContrastCount > (totalPixels * 0.70f) -> com.example.data.model.MediaCategory.RECEIPTS_DOCS
+            skyBlueTopCount > (totalPixels * 0.12f) -> com.example.data.model.MediaCategory.TRAVEL
+            warmPlatedCount > (totalPixels * 0.18f) -> com.example.data.model.MediaCategory.FOOD
+            furToneCount > (totalPixels * 0.30f) -> com.example.data.model.MediaCategory.PETS
+            else -> null
+        }
+    }
 }

@@ -1,0 +1,127 @@
+<resources>
+    <string name="app_name">SnapSweep</string>
+    <string name="clean_storage">Dọn Dẹp Bộ Nhớ</string>
+    <string name="duplicate_photos">Ảnh Trùng Lặp</string>
+    <string name="screenshots">Ảnh Màn Hình</string>
+    <string name="blurry_photos">Ảnh Bị Mờ</string>
+    <string name="large_files">Tệp Dung Lượng Lớn</string>
+    <string name="similar_photos">Ảnh Tương Tự</string>
+    <string name="documents">Tài Liệu</string>
+    <string name="swipe_cleaner">Bộ Dọn Vuốt Ảnh</string>
+    <string name="settings">Cài Đặt</string>
+    <string name="free_up_space">Giải Phóng Bộ Nhớ</string>
+    <string name="storage_used">Bộ Nhớ Đã Dùng</string>
+    <string name="permission_required">Yêu Cầu Quyền Truy Cập</string>
+    <string name="grant_permission">Cấp Quyền Truy Cập</string>
+
+    <string name="monthly_cleanup_report">Báo Cáo Dọn Dẹp Hàng Tháng</string>
+    <string name="cleanup_streak">Chuỗi Dọn Dẹp Liên Tục</string>
+    <string name="auto_purge">Tự Động Xóa Vĩnh Viễn Mục Đã Xóa</string>
+    <string name="auto_purge_desc">Tự động dọn dẹp thùng rác sau 30 ngày</string>
+    <string name="total_space_freed">Tổng Dung Lượng Đã Giải Phóng</string>
+    <string name="share_report">Chia Sẻ Báo Cáo</string>
+    <string name="close">Đóng</string>
+    <string name="view">Xem</string>
+    <string name="sort_by">Sắp Xếp Theo</string>
+    <string name="highest_clutter">Ảnh Rác Nhiều Nhất</string>
+    <string name="largest_first">Dung Lượng Lớn Nhất Trước</string>
+    <string name="newest_first">Mới Nhất Trước</string>
+    <string name="oldest_first">Cũ Nhất Trước</string>
+
+    <!-- Bảo Mật & Quyền Riêng Tư -->
+    <string name="privacy_info_title">Bảo Mật &amp; Quyền Riêng Tư</string>
+    <string name="privacy_info_subtitle">Quét Ảnh 100% Nội Bộ Trên Thiết Bị</string>
+    <string name="privacy_on_device_title">Không Tải Ảnh Lên Máy Chủ</string>
+    <string name="privacy_on_device_desc">Toàn bộ quá trình phân tích ảnh, lọc ảnh trùng và ảnh mờ đều xử lý trực tiếp trên điện thoại của bạn. Ảnh không bao giờ rời khỏi thiết bị.</string>
+    <string name="privacy_files_scanned_title">Các Tệp Nội Bộ Được Quét</string>
+    <string name="privacy_files_scanned_desc">SnapSweep chỉ quét siêu dữ liệu ảnh MediaStore, ảnh màn hình và ảnh mờ nội bộ để hỗ trợ dọn dẹp thư viện.</string>
+    <string name="privacy_permissions_title">Quyền Truy Cập Hệ Thống</string>
+    <string name="privacy_permissions_desc">Quyền đọc hình ảnh chỉ dùng duy nhất để đọc thông tin tệp và tạo ảnh thu nhỏ nội bộ.</string>
+    <string name="privacy_guarantee_title">Cam Kết An Toàn Dữ Liệu</string>
+    <string name="privacy_guarantee_desc">Không thu thập hay chia sẻ bất kỳ dữ liệu cá nhân hay ảnh nào cho bên thứ ba.</string>
+
+    <!-- Tiết Kiệm Pin -->
+    <string name="power_saving_title">Chế Độ Tiết Kiệm Pin</string>
+    <string name="power_saving_desc">Tạm dừng quét ngầm khi mức pin dưới 20% để tiết kiệm năng lượng</string>
+    <string name="power_saving_status_active">Đang Tiết Kiệm Pin: Đã tạm dừng quét ngầm (Pin &lt;20%)</string>
+    <string name="power_saving_status_normal">Pin Bình Thường: Tác vụ quét ngầm hoạt động</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title_1">Giải Phóng Bộ Nhớ Trong Vài Giây</string>
+    <string name="onboarding_sub_1">SnapSweep tự động phát hiện ảnh bị mờ, ảnh màn hình cũ, ảnh chụp liên tục trùng lặp và các video dung lượng lớn.</string>
+    <string name="onboarding_badge_1">BỘ DỌN DẸP AI THÔNG MINH</string>
+    
+    <string name="onboarding_title_2">Nội Bộ &amp; Riêng Tư 100%</string>
+    <string name="onboarding_sub_2">Ảnh và ký ức riêng tư của bạn không bao giờ rời khỏi điện thoại. Mọi phân tích và băm ảnh đều chạy hoàn toàn ngoại tuyến.</string>
+    <string name="onboarding_badge_2">KHÔNG TẢI LÊN ĐÁM MÂY</string>
+    
+    <string name="onboarding_title_3">Vuốt Trái Để Xóa, Vuốt Phải Để Giữ</string>
+    <string name="onboarding_sub_3">Xem xét và dọn dẹp cực kỳ dễ dàng bằng cách vuốt. Các mục rác sẽ vào hàng đợi lưu tạm an toàn trước khi xóa vĩnh viễn.</string>
+    <string name="onboarding_badge_3">DỌN VUỐT ẢNH NHANH CHÓNG</string>
+    
+    <string name="onboarding_title_4">Truy Cập Bộ Nhớ An Toàn</string>
+    <string name="onboarding_sub_4">Để phân tích ảnh mờ, ảnh trùng lặp và ảnh chụp màn hình ngoại tuyến, SnapSweep cần quyền đọc dữ liệu nội bộ an toàn.</string>
+    <string name="onboarding_badge_4">QUYỀN TRUY CẬP BỘ NHỚ</string>
+    
+    <string name="skip">Bỏ qua</string>
+    <string name="back">Quay lại</string>
+    <string name="get_started">Bắt đầu</string>
+    <string name="next">Tiếp tục</string>
+    <string name="access_approved">Đã Cấp Quyền Truy Cập ✓</string>
+    <string name="grant_storage_access">Cấp Quyền Truy Cập Bộ Nhớ</string>
+
+    <!-- Media Categories -->
+    <string name="category_old_screenshots_title">Ảnh Chụp Màn Hình Cũ</string>
+    <string name="category_old_screenshots_desc">Chụp cách đây hơn 30 ngày</string>
+    <string name="category_blurry_photos_title">Ảnh Bị Mờ &amp; Nhòe</string>
+    <string name="category_blurry_photos_desc">Phát hiện độ sắc nét thấp</string>
+    <string name="category_similar_bursts_title">Ảnh Trùng Lặp &amp; Liên Tục</string>
+    <string name="category_similar_bursts_desc">Các ảnh gần như giống hệt nhau chụp cách nhau vài giây</string>
+    <string name="category_receipts_docs_title">Biên Lai &amp; Tài Liệu</string>
+    <string name="category_receipts_docs_desc">Giấy tờ tạm thời, bảng trắng &amp; hóa đơn</string>
+    <string name="category_travel_title">Du Lịch &amp; Hành Trình</string>
+    <string name="category_travel_desc">Kỳ nghỉ, phong cảnh &amp; địa danh ngoài trời</string>
+    <string name="category_food_title">Ẩm Thực &amp; Ăn Uống</string>
+    <string name="category_food_desc">Món ăn, cà phê &amp; ảnh chụp nhà hàng</string>
+    <string name="category_pets_title">Thú Cưng &amp; Động Vật</string>
+    <string name="category_pets_desc">Chó, mèo &amp; những người bạn bốn chân</string>
+    <string name="category_heavy_media_title">Tệp Tin Dung Lượng Lớn</string>
+    <string name="category_heavy_media_desc">Video và bản ghi lớn &gt; 50MB</string>
+    <string name="category_on_this_day_title">Ngày Này Năm Xưa</string>
+    <string name="category_on_this_day_desc">Kỷ niệm được chụp vào ngày này trong những năm trước</string>
+
+    <!-- Additional UI Components -->
+    <string name="batch_delete_mode">CHẾ ĐỘ XÓA HÀNG LOẠT</string>
+    <string name="local_gallery">THƯ VIỆN NỘI BỘ</string>
+    <string name="select_multiple">Chọn Nhiều Mục</string>
+    <string name="group_by">Gom Nhóm Theo:</string>
+    <string name="photos_selected">Đã chọn %1$d ảnh</string>
+    <string name="to_free">%1$s để giải phóng</string>
+    <string name="delete_selected">Xóa Các Mục Đã Chọn</string>
+    <string name="delete_selected_title">Xóa Ảnh Đã Chọn?</string>
+    <string name="delete_selected_confirm">Bạn có chắc chắn muốn xóa vĩnh viễn %1$d ảnh này khỏi thiết bị của mình? Hành động này không thể hoàn tác.</string>
+    <string name="delete_button">Xóa</string>
+    <string name="cancel">Hủy</string>
+
+    <string name="all_clean">SẠCH SẼ HOÀN TOÀN!</string>
+    <string name="all_reviewed">Mọi ảnh trong danh mục này đã được xem xét xong.</string>
+    <string name="scan_library_again">Quét Lại Thư Viện</string>
+    <string name="media_properties">Thuộc Tính Phương Tiện</string>
+    <string name="filename">Tên tệp</string>
+    <string name="path">Đường dẫn</string>
+    <string name="date_taken">Ngày chụp</string>
+    <string name="resolution">Độ phân giải</string>
+    <string name="file_size">Kích thước tệp</string>
+    <string name="category">Danh mục</string>
+    <string name="blur_metric">Chỉ số mờ</string>
+    <string name="unknown">Không rõ</string>
+    <string name="undo_last_swipe">Hoàn tác lượt vuốt trước</string>
+    <string name="keep">GIỮ 💚</string>
+    <string name="trash">BỎ RÁC 🗑️</string>
+    <string name="item_moved_to_trash">Đã di chuyển vào thùng rác • Chạm để hoàn tác</string>
+    <string name="item_of_count">Mục %1$d / %2$d</string>
+    <string name="sort_label">SẮP XẾP:</string>
+    <string name="items_pending">Còn lại %1$d mục</string>
+    <string name="swipe_clean_btn">VUỐT ĐỂ DỌN</string>
+    <string name="clean_status">Đã dọn sạch! ✨</string>
+</resources>

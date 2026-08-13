@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,12 +55,37 @@ fun StorageHeader(
     scanProgress: Float,
     modifier: Modifier = Modifier
 ) {
+    // Space Saved Target Calculation
+    val targetBytes = remember(stats.totalBytesFreed) {
+        when {
+            stats.totalBytesFreed < 100 * 1024 * 1024L -> 100 * 1024 * 1024L // 100 MB Target
+            stats.totalBytesFreed < 500 * 1024 * 1024L -> 500 * 1024 * 1024L // 500 MB Target
+            stats.totalBytesFreed < 2 * 1024 * 1024 * 1024L -> 2 * 1024 * 1024 * 1024L // 2 GB Target
+            else -> 10 * 1024 * 1024 * 1024L // 10 GB Target
+        }
+    }
+
+    val goalProgress = (stats.totalBytesFreed.toFloat() / targetBytes.toFloat()).coerceIn(0f, 1f)
+    val formattedTarget = remember(targetBytes) {
+        val gb = targetBytes / (1024f * 1024f * 1024f)
+        if (gb >= 1.0f) String.format("%.0f GB Goal", gb) else String.format("%.0f MB Goal", targetBytes / (1024f * 1024f))
+    }
+
+    val rankTitle = remember(stats.totalBytesFreed) {
+        when {
+            stats.totalBytesFreed < 50 * 1024 * 1024L -> "🌱 Storage Starter"
+            stats.totalBytesFreed < 200 * 1024 * 1024L -> "🚀 Space Cadet"
+            stats.totalBytesFreed < 1000 * 1024 * 1024L -> "🏆 Storage Hero"
+            else -> "👑 Storage Master"
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .testTag("storage_header")
     ) {
-        // Hero Card
+        // Space Saved Dashboard Hero Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -85,7 +111,7 @@ fun StorageHeader(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(42.dp)
                                 .clip(CircleShape)
                                 .background(CyanPrimary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
@@ -94,13 +120,13 @@ fun StorageHeader(
                                 imageVector = Icons.Default.CleaningServices,
                                 contentDescription = "Cleaner",
                                 tint = CyanPrimary,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "TOTAL STORAGE FREED",
+                                text = "SPACE SAVED DASHBOARD",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     letterSpacing = 1.2.sp,
                                     fontWeight = FontWeight.Bold
@@ -117,7 +143,7 @@ fun StorageHeader(
                         }
                     }
 
-                    // Badge
+                    // Rank Badge
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
@@ -126,7 +152,7 @@ fun StorageHeader(
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = "${stats.totalItemsCleaned} Items",
+                            text = rankTitle,
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = EmeraldKeep
                         )
@@ -135,8 +161,41 @@ fun StorageHeader(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Storage Reclaimed Goal Progress Bar
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Reclamation Progress (${(goalProgress * 100).toInt()}%)",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = CyanPrimary
+                        )
+                        Text(
+                            text = "${stats.totalItemsCleaned} Items Cleaned • $formattedTarget",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TextSecondary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    LinearProgressIndicator(
+                        progress = { goalProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        color = CyanPrimary,
+                        trackColor = DarkSurfaceVariant
+                    )
+                }
+
                 // Scanning Progress bar if active
                 if (isScanning) {
+                    Spacer(modifier = Modifier.height(12.dp))
                     val animatedProgress by animateFloatAsState(
                         targetValue = scanProgress,
                         animationSpec = tween(durationMillis = 300),

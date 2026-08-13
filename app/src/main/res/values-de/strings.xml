@@ -1,0 +1,127 @@
+<resources>
+    <string name="app_name">SnapSweep</string>
+    <string name="clean_storage">Speicher Bereinigen</string>
+    <string name="duplicate_photos">Doppelte Fotos</string>
+    <string name="screenshots">Screenshots</string>
+    <string name="blurry_photos">Unscharfe Fotos</string>
+    <string name="large_files">Große Dateien</string>
+    <string name="similar_photos">Ähnliche Fotos</string>
+    <string name="documents">Dokumente</string>
+    <string name="swipe_cleaner">Wisch-Reiniger</string>
+    <string name="settings">Einstellungen</string>
+    <string name="free_up_space">Speicher Freigeben</string>
+    <string name="storage_used">Speicher Belegt</string>
+    <string name="permission_required">Berechtigung Erforderlich</string>
+    <string name="grant_permission">Berechtigung Erteilen</string>
+
+    <string name="monthly_cleanup_report">Monatlicher Bereinigungsbericht</string>
+    <string name="cleanup_streak">Reinigungsserie</string>
+    <string name="auto_purge">Gelöschte Elemente Automatisch Leeren</string>
+    <string name="auto_purge_desc">Papierkorb automatisch nach 30 Tagen leeren</string>
+    <string name="total_space_freed">Gesamter Freigegebener Speicher</string>
+    <string name="share_report">Bericht Teilen</string>
+    <string name="close">Schließen</string>
+    <string name="view">Anzeigen</string>
+    <string name="sort_by">Sortieren Nach</string>
+    <string name="highest_clutter">Höchster Müllanteil</string>
+    <string name="largest_first">Größte Zuerst</string>
+    <string name="newest_first">Neueste Zuerst</string>
+    <string name="oldest_first">Älteste Zuerst</string>
+
+    <!-- Datenschutz -->
+    <string name="privacy_info_title">Datenschutz &amp; Vertrauen</string>
+    <string name="privacy_info_subtitle">100% Lokale Fotosuche auf dem Gerät</string>
+    <string name="privacy_on_device_title">Kein Server-Upload</string>
+    <string name="privacy_on_device_desc">Alle Foto-Analysen und Duplikatprüfungen laufen ausschließlich lokal auf Ihrem Gerät. Fotos verlassen Ihr Gerät niemals.</string>
+    <string name="privacy_files_scanned_title">Gescannte Lokale Dateien</string>
+    <string name="privacy_files_scanned_desc">SnapSweep scannt lokale Bilder, Screenshots und unscharfe Fotos nur zur Organisation der Bereinigung.</string>
+    <string name="privacy_permissions_title">Systemberechtigungen</string>
+    <string name="privacy_permissions_desc">Die Berechtigung für Bilder wird nur zum Lesen lokaler Dateimetadaten verwendet.</string>
+    <string name="privacy_guarantee_title">Datengarantie</string>
+    <string name="privacy_guarantee_desc">Es werden keine persönlichen Analysen oder Fotodaten erfasst oder weitergegeben.</string>
+
+    <!-- Energiesparmodus -->
+    <string name="power_saving_title">Energiesparschutz</string>
+    <string name="power_saving_desc">Hintergrund-Scans pausieren, wenn der Akkustand unter 20% liegt</string>
+    <string name="power_saving_status_active">Energiesparen Aktiv: Aufgaben pausiert (&lt;20% Akku)</string>
+    <string name="power_saving_status_normal">Akku Normal: Hintergrundaufgaben aktiv</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title_1">Speicher in Sekunden freigeben</string>
+    <string name="onboarding_sub_1">SnapSweep erkennt automatisch unscharfe Fotos, alte Screenshots, doppelte Aufnahmen und riesige Videos.</string>
+    <string name="onboarding_badge_1">INTELLIGENTER REINIGER</string>
+    
+    <string name="onboarding_title_2">100% Lokal &amp; Privat</string>
+    <string name="onboarding_sub_2">Ihre Fotos und privaten Erinnerungen verlassen niemals Ihr Telefon. Alle Analysen laufen streng offline ab.</string>
+    <string name="onboarding_badge_2">KEIN CLOUD-UPLOAD</string>
+    
+    <string name="onboarding_title_3">Wischen zum Löschen oder Behalten</string>
+    <string name="onboarding_sub_3">Das Bereinigen ist so einfach wie Wischen. Gelöschte Bilder landen sicher im Papierkorb vor dem endgültigen Löschen.</string>
+    <string name="onboarding_badge_3">SCHNELLES WISCH-REINIGEN</string>
+    
+    <string name="onboarding_title_4">Sicherer Speicherzugriff</string>
+    <string name="onboarding_sub_4">Um unscharfe Fotos, Duplikate und Screenshots offline zu analysieren, benötigt SnapSweep die Berechtigung zum Lesen.</string>
+    <string name="onboarding_badge_4">SPEICHERBERECHTIGUNG</string>
+    
+    <string name="skip">Überspringen</string>
+    <string name="back">Zurück</string>
+    <string name="get_started">Loslegen</string>
+    <string name="next">Weiter</string>
+    <string name="access_approved">Zugriff Erlaubt ✓</string>
+    <string name="grant_storage_access">Speicherzugriff Erteilen</string>
+
+    <!-- Media Categories -->
+    <string name="category_old_screenshots_title">Alte Screenshots</string>
+    <string name="category_old_screenshots_desc">Vor mehr als 30 Tagen aufgenommen</string>
+    <string name="category_blurry_photos_title">Unscharfe Fotos</string>
+    <string name="category_blurry_photos_desc">Geringe Bildschärfe erkannt</string>
+    <string name="category_similar_bursts_title">Ähnliche Bilder &amp; Serien</string>
+    <string name="category_similar_bursts_desc">Fast identische Aufnahmen im Sekundenabstand</string>
+    <string name="category_receipts_docs_title">Belege &amp; Dokumente</string>
+    <string name="category_receipts_docs_desc">Temporäre Dokumente, Quittungen &amp; Rechnungen</string>
+    <string name="category_travel_title">Reisen &amp; Ausflüge</string>
+    <string name="category_travel_desc">Urlaub, Landschaften &amp; Sehenswürdigkeiten</string>
+    <string name="category_food_title">Essen &amp; Trinken</string>
+    <string name="category_food_desc">Gerichte, Kaffee &amp; Restaurantfotos</string>
+    <string name="category_pets_title">Haustiere &amp; Tiere</string>
+    <string name="category_pets_desc">Hunde, Katzen &amp; pelzige Begleiter</string>
+    <string name="category_heavy_media_title">Große Medien</string>
+    <string name="category_heavy_media_desc">Große Videos und Aufnahmen &gt; 50MB</string>
+    <string name="category_on_this_day_title">An diesem Tag</string>
+    <string name="category_on_this_day_desc">Erinnerungen an dieses Datum aus vergangenen Jahren</string>
+
+    <!-- Additional UI Components -->
+    <string name="batch_delete_mode">STAPELLÖSCHMODUS</string>
+    <string name="local_gallery">LOKALE GALERIE</string>
+    <string name="select_multiple">Mehrere auswählen</string>
+    <string name="group_by">Gruppieren nach:</string>
+    <string name="photos_selected">%1$d Fotos ausgewählt</string>
+    <string name="to_free">%1$s freigeben</string>
+    <string name="delete_selected">Auswahl löschen</string>
+    <string name="delete_selected_title">Ausgewählte Fotos löschen?</string>
+    <string name="delete_selected_confirm">Möchten Sie diese %1$d Fotos wirklich dauerhaft von Ihrem Gerät löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_button">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+
+    <string name="all_clean">ALLES SAUBER!</string>
+    <string name="all_reviewed">Alle Fotos in dieser Kategorie wurden überprüft.</string>
+    <string name="scan_library_again">Galerie erneut scannen</string>
+    <string name="media_properties">Eigenschaften der Datei</string>
+    <string name="filename">Dateiname</string>
+    <string name="path">Pfad</string>
+    <string name="date_taken">Aufnahmedatum</string>
+    <string name="resolution">Auflösung</string>
+    <string name="file_size">Dateigröße</string>
+    <string name="category">Kategorie</string>
+    <string name="blur_metric">Unscharfe-Metrik</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="undo_last_swipe">Letztes Wischen rückgängig machen</string>
+    <string name="keep">BEHALTEN 💚</string>
+    <string name="trash">LÖSCHEN 🗑️</string>
+    <string name="item_moved_to_trash">In den Papierkorb verschoben • Zum Rückgängigmachen tippen</string>
+    <string name="item_of_count">Element %1$d von %2$d</string>
+    <string name="sort_label">SORTIERUNG:</string>
+    <string name="items_pending">%1$d Elemente ausstehend</string>
+    <string name="swipe_clean_btn">WISCHEN &amp; REINIGEN</string>
+    <string name="clean_status">Sauber! ✨</string>
+</resources>

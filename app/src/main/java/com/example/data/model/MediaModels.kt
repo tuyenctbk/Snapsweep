@@ -7,49 +7,70 @@ import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.FlightTakeoff
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PhonelinkSetup
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class MediaCategory(
-    val title: String,
-    val description: String,
+    val titleResId: Int,
+    val descriptionResId: Int,
     val icon: ImageVector,
     val badgeColorHex: Long
 ) {
     OLD_SCREENSHOTS(
-        title = "Old Screenshots",
-        description = "Captured over 30 days ago",
+        titleResId = com.example.R.string.category_old_screenshots_title,
+        descriptionResId = com.example.R.string.category_old_screenshots_desc,
         icon = Icons.Default.PhonelinkSetup,
         badgeColorHex = 0xFF0284C7 // Cyan
     ),
     BLURRY_PHOTOS(
-        title = "Blurry & Out of Focus",
-        description = "Low sharpness detected",
+        titleResId = com.example.R.string.category_blurry_photos_title,
+        descriptionResId = com.example.R.string.category_blurry_photos_desc,
         icon = Icons.Default.BlurOn,
         badgeColorHex = 0xFFF59E0B // Amber
     ),
     SIMILAR_BURSTS(
-        title = "Similar & Bursts",
-        description = "Near-identical shots taken seconds apart",
+        titleResId = com.example.R.string.category_similar_bursts_title,
+        descriptionResId = com.example.R.string.category_similar_bursts_desc,
         icon = Icons.Default.ContentCopy,
         badgeColorHex = 0xFF8B5CF6 // Purple
     ),
     RECEIPTS_DOCS(
-        title = "Receipts & Documents",
-        description = "Temporary papers, whiteboards & bills",
+        titleResId = com.example.R.string.category_receipts_docs_title,
+        descriptionResId = com.example.R.string.category_receipts_docs_desc,
         icon = Icons.Default.Description,
         badgeColorHex = 0xFF10B981 // Emerald
     ),
+    TRAVEL(
+        titleResId = com.example.R.string.category_travel_title,
+        descriptionResId = com.example.R.string.category_travel_desc,
+        icon = Icons.Default.FlightTakeoff,
+        badgeColorHex = 0xFF3B82F6 // Blue
+    ),
+    FOOD(
+        titleResId = com.example.R.string.category_food_title,
+        descriptionResId = com.example.R.string.category_food_desc,
+        icon = Icons.Default.Restaurant,
+        badgeColorHex = 0xFFF97316 // Orange
+    ),
+    PETS(
+        titleResId = com.example.R.string.category_pets_title,
+        descriptionResId = com.example.R.string.category_pets_desc,
+        icon = Icons.Default.Pets,
+        badgeColorHex = 0xFFA855F7 // Purple
+    ),
     HEAVY_MEDIA(
-        title = "Heavy Media",
-        description = "Large videos and recordings > 50MB",
+        titleResId = com.example.R.string.category_heavy_media_title,
+        descriptionResId = com.example.R.string.category_heavy_media_desc,
         icon = Icons.Default.Videocam,
         badgeColorHex = 0xFFEF4444 // Rose
     ),
     ON_THIS_DAY(
-        title = "On This Day",
-        description = "Memories captured on this date in past years",
+        titleResId = com.example.R.string.category_on_this_day_title,
+        descriptionResId = com.example.R.string.category_on_this_day_desc,
         icon = Icons.Default.CalendarToday,
         badgeColorHex = 0xFFEC4899 // Pink
     )

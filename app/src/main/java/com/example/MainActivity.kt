@@ -86,6 +86,10 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(uiState.showOnboarding) {
                     viewModel.checkPermissions(context)
                     if (!uiState.showOnboarding) {
+                        viewModel.scheduleWeeklyCleanupWorker(context)
+                        viewModel.checkAndExecute30DayAutoPurge(context)
+                        viewModel.checkPowerSavingMode(context)
+
                         val permissionsNeeded = mutableListOf<String>()
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
@@ -144,16 +148,21 @@ class MainActivity : ComponentActivity() {
                 } else if (uiState.activeCategory != null) {
                     SwipeCleanerScreen(
                         category = uiState.activeCategory!!,
+                        allCategories = uiState.categories,
+                        activeSortOption = uiState.activeSortOption,
                         queue = uiState.activeQueue,
                         currentIndex = uiState.activeIndex,
                         pendingTrashCount = uiState.pendingTrash.size,
                         canUndo = uiState.swipeHistory.isNotEmpty(),
                         onBack = { viewModel.closeCategoryCleaner() },
+                        onSelectCategory = { cat -> viewModel.openCategoryCleaner(cat) },
+                        onSelectSortOption = { sort -> viewModel.setSortOption(sort) },
                         onSwipeLeft = { item -> viewModel.swipeLeft(item) },
                         onSwipeRight = { item -> viewModel.swipeRight(item) },
                         onUndo = { viewModel.undoLastSwipe() },
                         onZoom = { item -> viewModel.setFullscreenItem(item) },
-                        onOpenTrashSheet = { viewModel.setShowTrashSheet(true) }
+                        onOpenTrashSheet = { viewModel.setShowTrashSheet(true) },
+                        onScanAgain = { viewModel.scan(context) }
                     )
                 } else {
                     DashboardScreen(
@@ -168,13 +177,28 @@ class MainActivity : ComponentActivity() {
                         isWorkerRunning = uiState.isBackgroundWorkerRunning,
                         taggedCount = uiState.taggedMediaCount,
                         bgWorkerMessage = uiState.bgWorkerMessage,
+                        showBulkCleanDialog = uiState.showBulkCleanDialog,
+                        cleanupStreakDays = uiState.cleanupStreakDays,
                         onRunBackgroundWorker = { viewModel.triggerBackgroundScan(context) },
                         onRequestPermission = { requestGalleryPermissions() },
                         onRefreshScan = { viewModel.scan(context) },
                         onOpenCategory = { category -> viewModel.openCategoryCleaner(category) },
                         onOpenTrashSheet = { viewModel.setShowTrashSheet(true) },
                         onClearNotification = { viewModel.clearNotification() },
-                        onOpenSettings = { viewModel.setShowSettingsDialog(true) }
+                        onOpenSettings = { viewModel.setShowSettingsDialog(true) },
+                        onOpenMonthlyReport = { viewModel.setShowMonthlyReportDialog(true) },
+                        onOpenBulkCleanDialog = { viewModel.setShowBulkCleanDialog(true) },
+                        onConfirmBulkClean = { viewModel.bulkCleanCategories() },
+                        onDismissBulkCleanDialog = { viewModel.setShowBulkCleanDialog(false) }
+                    )
+                }
+
+                // Monthly Cleanup Progress Report Dialog
+                if (uiState.showMonthlyReportDialog) {
+                    com.example.ui.components.MonthlyReportDialog(
+                        stats = uiState.stats,
+                        streakDays = uiState.cleanupStreakDays,
+                        onDismiss = { viewModel.setShowMonthlyReportDialog(false) }
                     )
                 }
 
@@ -199,10 +223,31 @@ class MainActivity : ComponentActivity() {
                         isWorkerRunning = uiState.isBackgroundWorkerRunning,
                         taggedCount = uiState.taggedMediaCount,
                         bgWorkerMessage = uiState.bgWorkerMessage,
+                        isAutoPurgeEnabled = uiState.isAutoPurgeEnabled,
+                        onToggleAutoPurge = { enabled -> viewModel.setAutoPurgeEnabled(enabled) },
+                        weeklyWorkerMessage = uiState.weeklyWorkerMessage,
+                        onRunWeeklyWorkerNow = { viewModel.triggerWeeklyWorkerNow(context) },
+                        onShowGestureGuide = { viewModel.setShowGestureGuideOverlay(true) },
                         onRunBackgroundWorker = { viewModel.triggerBackgroundScan(context) },
                         onReplayOnboarding = { viewModel.reopenOnboarding() },
                         onShowRateApp = { viewModel.setShowRateDialog(true) },
+                        onOpenPrivacyInfo = { viewModel.setShowPrivacyInfoDialog(true) },
+                        isPowerSavingMode = uiState.isPowerSavingMode,
                         onDismiss = { viewModel.setShowSettingsDialog(false) }
+                    )
+                }
+
+                // Privacy Info & Trust Guarantee Dialog
+                if (uiState.showPrivacyInfoDialog) {
+                    com.example.ui.components.PrivacyInfoDialog(
+                        onDismiss = { viewModel.setShowPrivacyInfoDialog(false) }
+                    )
+                }
+
+                // Educational Swipe Gesture Animation Overlay
+                if (uiState.showGestureGuideOverlay) {
+                    com.example.ui.components.SwipeGestureGuideOverlay(
+                        onDismiss = { viewModel.setShowGestureGuideOverlay(false) }
                     )
                 }
 

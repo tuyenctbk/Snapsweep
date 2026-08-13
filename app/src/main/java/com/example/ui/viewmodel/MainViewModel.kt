@@ -22,6 +22,8 @@ import java.io.File
 import com.example.data.firebase.FirebaseManager
 import com.example.ui.theme.ThemeMode
 
+import com.example.ui.screens.SmartSortOption
+
 sealed interface SwipeAction {
     data class Trashed(val item: MediaItem) : SwipeAction
     data class Kept(val item: MediaItem) : SwipeAction
@@ -35,6 +37,7 @@ data class MainUiState(
     val activeCategory: MediaCategory? = null,
     val activeQueue: List<MediaItem> = emptyList(),
     val activeIndex: Int = 0,
+    val activeSortOption: SmartSortOption = SmartSortOption.HIGHEST_CLUTTER,
     val swipeHistory: List<SwipeAction> = emptyList(),
     val stats: StorageStats = StorageStats(),
     val fullscreenItem: MediaItem? = null,
@@ -47,13 +50,24 @@ data class MainUiState(
     val taggedMediaCount: Int = 0,
     val isBackgroundWorkerRunning: Boolean = false,
     val bgWorkerMessage: String? = null,
-    val themeMode: ThemeMode = ThemeMode.DARK,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val showRateDialog: Boolean = false,
     val showThemeDialog: Boolean = false,
     val showSettingsDialog: Boolean = false,
+    val showPrivacyInfoDialog: Boolean = false,
+    val isPowerSavingMode: Boolean = false,
+    val showMonthlyReportDialog: Boolean = false,
     val hasUserRatedApp: Boolean = false,
     val hasCompletedOnboarding: Boolean = false,
-    val showOnboarding: Boolean = true
+    val showOnboarding: Boolean = true,
+    val lastTrashedItem: MediaItem? = null,
+    val showBulkCleanDialog: Boolean = false,
+    val isAutoPurgeEnabled: Boolean = true,
+    val showGestureGuideOverlay: Boolean = false,
+    val hasSeenGestureGuide: Boolean = false,
+    val weeklyWorkerMessage: String? = null,
+    val cleanupStreakDays: Int = 3,
+    val lastCleanupDateMillis: Long = System.currentTimeMillis()
 )
 
 class MainViewModel(
@@ -200,17 +214,74 @@ class MainViewModel(
         }
     }
 
-    fun openCategoryCleaner(category: MediaCategory) {
+    private fun sortQueue(items: List<MediaItem>, sortOption: SmartSortOption): List<MediaItem> {
+        return when (sortOption) {
+            SmartSortOption.HIGHEST_CLUTTER -> items.sortedByDescending {
+                if (it.category == MediaCategory.BLURRY_PHOTOS) 100f - it.blurScore else it.sizeBytes.toFloat()
+            }
+            SmartSortOption.LARGEST_FIRST -> items.sortedByDescending { it.sizeBytes }
+            SmartSortOption.NEWEST_FIRST -> items.sortedByDescending { it.dateTakenMillis }
+            SmartSortOption.OLDEST_FIRST -> items.sortedBy { it.dateTakenMillis }
+        }
+    }
+
+    fun setSortOption(sortOption: SmartSortOption) {
+        _uiState.update { state ->
+            val sorted = sortQueue(state.activeQueue, sortOption)
+            state.copy(
+                activeSortOption = sortOption,
+                activeQueue = sorted,
+                activeIndex = 0
+            )
+        }
+    }
+
+    fun setShowMonthlyReportDialog(show: Boolean) {
+        _uiState.update { it.copy(showMonthlyReportDialog = show) }
+    }
+
+    private fun updateStreak() {
+        val now = System.currentTimeMillis()
+        val lastClean = _uiState.value.lastCleanupDateMillis
+        val currentStreak = _uiState.value.cleanupStreakDays
+
+        if (lastClean == 0L) {
+            _uiState.update { it.copy(cleanupStreakDays = 1, lastCleanupDateMillis = now) }
+            return
+        }
+
+        val diffMs = now - lastClean
+        val diffHours = diffMs / (1000 * 60 * 60)
+
+        if (diffHours < 24) {
+            _uiState.update { it.copy(lastCleanupDateMillis = now) }
+        } else if (diffHours < 48) {
+            _uiState.update { it.copy(cleanupStreakDays = currentStreak + 1, lastCleanupDateMillis = now) }
+        } else {
+            _uiState.update { it.copy(cleanupStreakDays = 1, lastCleanupDateMillis = now) }
+        }
+    }
+
+    fun openCategoryCleaner(
+        category: MediaCategory,
+        sortOption: SmartSortOption = _uiState.value.activeSortOption
+    ) {
         val summary = _uiState.value.categories.firstOrNull { it.category == category }
         val pendingIds = _uiState.value.pendingTrash.map { it.id }.toSet()
-        val queueItems = summary?.items?.filter { !pendingIds.contains(it.id) } ?: emptyList()
+        val rawItems = summary?.items?.filter { !pendingIds.contains(it.id) } ?: emptyList()
+        val sortedItems = sortQueue(rawItems, sortOption)
+
+        val showGuide = !_uiState.value.hasSeenGestureGuide
 
         _uiState.update {
             it.copy(
                 activeCategory = category,
-                activeQueue = queueItems,
+                activeQueue = sortedItems,
+                activeSortOption = sortOption,
                 activeIndex = 0,
-                swipeHistory = emptyList()
+                swipeHistory = emptyList(),
+                showGestureGuideOverlay = showGuide,
+                hasSeenGestureGuide = true
             )
         }
     }
@@ -227,6 +298,7 @@ class MainViewModel(
     }
 
     fun swipeLeft(item: MediaItem) {
+        updateStreak()
         val updatedTrash = _uiState.value.pendingTrash.toMutableList().apply {
             if (none { it.id == item.id }) add(item)
         }
@@ -237,7 +309,44 @@ class MainViewModel(
             state.copy(
                 pendingTrash = updatedTrash,
                 activeIndex = nextIndex,
-                swipeHistory = history
+                swipeHistory = history,
+                lastTrashedItem = item
+            )
+        }
+    }
+
+    fun dismissLastTrashedItem() {
+        _uiState.update { it.copy(lastTrashedItem = null) }
+    }
+
+    fun setShowBulkCleanDialog(show: Boolean) {
+        _uiState.update { it.copy(showBulkCleanDialog = show) }
+    }
+
+    fun bulkCleanCategories(
+        targetCategories: List<MediaCategory> = listOf(MediaCategory.OLD_SCREENSHOTS, MediaCategory.BLURRY_PHOTOS)
+    ) {
+        val allMatchingItems = _uiState.value.categories
+            .filter { targetCategories.contains(it.category) }
+            .flatMap { it.items }
+
+        if (allMatchingItems.isEmpty()) return
+
+        val updatedTrash = _uiState.value.pendingTrash.toMutableList()
+        var addedCount = 0
+        for (item in allMatchingItems) {
+            if (updatedTrash.none { it.id == item.id }) {
+                updatedTrash.add(item)
+                addedCount++
+            }
+        }
+
+        _uiState.update { state ->
+            state.copy(
+                pendingTrash = updatedTrash,
+                showBulkCleanDialog = false,
+                showTrashSheet = true,
+                userNotification = "Added $addedCount items to pending trash queue!"
             )
         }
     }
@@ -528,6 +637,26 @@ class MainViewModel(
         _uiState.update { it.copy(showSettingsDialog = show) }
     }
 
+    fun setShowPrivacyInfoDialog(show: Boolean) {
+        _uiState.update { it.copy(showPrivacyInfoDialog = show) }
+    }
+
+    fun checkPowerSavingMode(context: Context) {
+        val batteryStatus: android.content.Intent? = android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED).let { filter ->
+            context.registerReceiver(null, filter)
+        }
+        val level: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
+        val batteryPct: Float = if (level >= 0 && scale > 0) level * 100 / scale.toFloat() else 100f
+
+        val status: Int = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val isCharging: Boolean = status == android.os.BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == android.os.BatteryManager.BATTERY_STATUS_FULL
+
+        val isLowBattery = batteryPct < 20f && !isCharging
+        _uiState.update { it.copy(isPowerSavingMode = isLowBattery) }
+    }
+
     fun setShowRateDialog(show: Boolean) {
         _uiState.update { it.copy(showRateDialog = show) }
     }
@@ -546,6 +675,72 @@ class MainViewModel(
         val currentState = _uiState.value
         if (!currentState.hasUserRatedApp && currentState.stats.totalItemsCleaned >= 2) {
             _uiState.update { it.copy(showRateDialog = true) }
+        }
+    }
+
+    fun setAutoPurgeEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(isAutoPurgeEnabled = enabled) }
+    }
+
+    fun setShowGestureGuideOverlay(show: Boolean) {
+        _uiState.update { it.copy(showGestureGuideOverlay = show, hasSeenGestureGuide = true) }
+    }
+
+    fun scheduleWeeklyCleanupWorker(context: Context) {
+        val periodicRequest = androidx.work.PeriodicWorkRequestBuilder<com.example.data.worker.WeeklyCleanupWorker>(
+            7, java.util.concurrent.TimeUnit.DAYS
+        ).build()
+
+        androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            com.example.data.worker.WeeklyCleanupWorker.WORK_NAME,
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            periodicRequest
+        )
+    }
+
+    fun triggerWeeklyWorkerNow(context: Context) {
+        val oneTimeRequest = androidx.work.OneTimeWorkRequestBuilder<com.example.data.worker.WeeklyCleanupWorker>()
+            .build()
+
+        val workManager = androidx.work.WorkManager.getInstance(context)
+        workManager.enqueueUniqueWork(
+            "WeeklyCleanupTestWork",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            oneTimeRequest
+        )
+
+        _uiState.update { it.copy(weeklyWorkerMessage = "Weekly cleanup worker enqueued!") }
+
+        viewModelScope.launch {
+            workManager.getWorkInfoByIdFlow(oneTimeRequest.id).collect { workInfo ->
+                if (workInfo != null && workInfo.state == androidx.work.WorkInfo.State.SUCCEEDED) {
+                    val itemsFound = workInfo.outputData.getInt(com.example.data.worker.WeeklyCleanupWorker.KEY_ITEMS_FOUND, 0)
+                    _uiState.update {
+                        it.copy(
+                            weeklyWorkerMessage = "Weekly scanner checked gallery: Found $itemsFound clutter items. Notification dispatched!",
+                            userNotification = "Weekly cleanup check complete! Found $itemsFound clutter items."
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun checkAndExecute30DayAutoPurge(context: Context) {
+        if (!_uiState.value.isAutoPurgeEnabled) return
+
+        val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
+        val expiredTrashItems = _uiState.value.pendingTrash.filter { it.dateTakenMillis < thirtyDaysAgo }
+
+        if (expiredTrashItems.isNotEmpty()) {
+            val freedBytes = expiredTrashItems.sumOf { it.sizeBytes }
+            _uiState.update { state ->
+                val remainingTrash = state.pendingTrash.filter { !expiredTrashItems.contains(it) }
+                state.copy(
+                    pendingTrash = remainingTrash,
+                    userNotification = "Auto-purged ${expiredTrashItems.size} items older than 30 days from Recently Deleted trash!"
+                )
+            }
         }
     }
 

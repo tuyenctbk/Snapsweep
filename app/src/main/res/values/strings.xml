@@ -4,10 +4,124 @@
     <string name="duplicate_photos">Duplicate Photos</string>
     <string name="screenshots">Screenshots</string>
     <string name="blurry_photos">Blurry Photos</string>
+    <string name="large_files">Large Files</string>
+    <string name="similar_photos">Similar Photos</string>
+    <string name="documents">Documents</string>
     <string name="swipe_cleaner">Swipe Cleaner</string>
     <string name="settings">Settings</string>
     <string name="free_up_space">Free up Space</string>
     <string name="storage_used">Storage Used</string>
     <string name="permission_required">Permission Required</string>
     <string name="grant_permission">Grant Permission</string>
+
+    <string name="monthly_cleanup_report">Monthly Cleanup Report</string>
+    <string name="cleanup_streak">Cleanup Streak</string>
+    <string name="auto_purge">Auto-Purge Recently Deleted</string>
+    <string name="auto_purge_desc">Automatically purge items in trash after 30 days</string>
+    <string name="total_space_freed">Total Space Freed</string>
+    <string name="share_report">Share Report</string>
+    <string name="close">Close</string>
+    <string name="view">View</string>
+    <string name="sort_by">Sort By</string>
+    <string name="highest_clutter">Highest Clutter</string>
+    <string name="largest_first">Largest First</string>
+    <string name="newest_first">Newest First</string>
+    <string name="oldest_first">Oldest First</string>
+
+    <!-- Privacy Info -->
+    <string name="privacy_info_title">Privacy Info &amp; Trust</string>
+    <string name="privacy_info_subtitle">100% On-Device Local Photo Scanning</string>
+    <string name="privacy_on_device_title">Zero Server Uploads</string>
+    <string name="privacy_on_device_desc">All photo analysis, duplicate hashing, and blur detection run locally on your device hardware. Your photos never touch external servers or cloud services.</string>
+    <string name="privacy_files_scanned_title">Local Files Scanned</string>
+    <string name="privacy_files_scanned_desc">SnapSweep scans local MediaStore images, screenshots, duplicate hashes, and blurry photos strictly for organizing your gallery cleanup.</string>
+    <string name="privacy_permissions_title">System Permissions</string>
+    <string name="privacy_permissions_desc">Read Media Images permission is required solely to read local file metadata and generate local image thumbnails.</string>
+    <string name="privacy_guarantee_title">Data Security Guarantee</string>
+    <string name="privacy_guarantee_desc">No personal analytics or photo telemetry are collected or shared with third parties.</string>
+
+    <!-- Power Saving Mode -->
+    <string name="power_saving_title">Power Saving Protection</string>
+    <string name="power_saving_desc">Pause background scanning tasks when battery is under 20% to conserve power</string>
+    <string name="power_saving_status_active">Power Saving Active: Background tasks paused (&lt;20% battery)</string>
+    <string name="power_saving_status_normal">Power Battery Normal: Background tasks active</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title_1">Reclaim Storage in Seconds</string>
+    <string name="onboarding_sub_1">SnapSweep automatically detects blurry photos, old screenshots, duplicate bursts, and massive videos.</string>
+    <string name="onboarding_badge_1">SMART AI CLEANER</string>
+    
+    <string name="onboarding_title_2">100% On-Device &amp; Private</string>
+    <string name="onboarding_sub_2">Your photos and private memories never leave your phone. All image analysis and hashing run strictly offline.</string>
+    <string name="onboarding_badge_2">ZERO CLOUD UPLOADS</string>
+    
+    <string name="onboarding_title_3">Swipe Left to Trash, Right to Keep</string>
+    <string name="onboarding_sub_3">Reviewing clutter is as easy as swiping. Trash items safely enter a review queue before permanent deletion.</string>
+    <string name="onboarding_badge_3">FAST SWIPE CLEANUP</string>
+    
+    <string name="onboarding_title_4">Secure Storage Access</string>
+    <string name="onboarding_sub_4">To analyze blurry photos, duplicates, and screenshots offline, SnapSweep needs safe local reading permission.</string>
+    <string name="onboarding_badge_4">STORAGE PERMISSION</string>
+    
+    <string name="skip">Skip</string>
+    <string name="back">Back</string>
+    <string name="get_started">Get Started</string>
+    <string name="next">Next</string>
+    <string name="access_approved">Access Approved ✓</string>
+    <string name="grant_storage_access">Grant Storage Access</string>
+
+    <!-- Media Categories -->
+    <string name="category_old_screenshots_title">Old Screenshots</string>
+    <string name="category_old_screenshots_desc">Captured over 30 days ago</string>
+    <string name="category_blurry_photos_title">Blurry &amp; Out of Focus</string>
+    <string name="category_blurry_photos_desc">Low sharpness detected</string>
+    <string name="category_similar_bursts_title">Similar &amp; Bursts</string>
+    <string name="category_similar_bursts_desc">Near-identical shots taken seconds apart</string>
+    <string name="category_receipts_docs_title">Receipts &amp; Documents</string>
+    <string name="category_receipts_docs_desc">Temporary papers, whiteboards &amp; bills</string>
+    <string name="category_travel_title">Travel &amp; Trips</string>
+    <string name="category_travel_desc">Vacations, scenery &amp; outdoor landmarks</string>
+    <string name="category_food_title">Food &amp; Dining</string>
+    <string name="category_food_desc">Plated meals, coffee &amp; restaurant shots</string>
+    <string name="category_pets_title">Pets &amp; Animals</string>
+    <string name="category_pets_desc">Dogs, cats &amp; furry companions</string>
+    <string name="category_heavy_media_title">Heavy Media</string>
+    <string name="category_heavy_media_desc">Large videos and recordings &gt; 50MB</string>
+    <string name="category_on_this_day_title">On This Day</string>
+    <string name="category_on_this_day_desc">Memories captured on this date in past years</string>
+
+    <!-- Additional UI Components -->
+    <string name="batch_delete_mode">BATCH DELETE MODE</string>
+    <string name="local_gallery">LOCAL GALLERY</string>
+    <string name="select_multiple">Select Multiple</string>
+    <string name="group_by">Group By:</string>
+    <string name="photos_selected">%1$d photos selected</string>
+    <string name="to_free">%1$s to free</string>
+    <string name="delete_selected">Delete Selected</string>
+    <string name="delete_selected_title">Delete Selected Photos?</string>
+    <string name="delete_selected_confirm">Are you sure you want to permanently delete these %1$d photos from your device? This action cannot be undone.</string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="all_clean">ALL CLEAN!</string>
+    <string name="all_reviewed">All photos in this category have been reviewed.</string>
+    <string name="scan_library_again">Scan Library Again</string>
+    <string name="media_properties">Media Properties</string>
+    <string name="filename">Filename</string>
+    <string name="path">Path</string>
+    <string name="date_taken">Date Taken</string>
+    <string name="resolution">Resolution</string>
+    <string name="file_size">File Size</string>
+    <string name="category">Category</string>
+    <string name="blur_metric">Blur Metric</string>
+    <string name="unknown">Unknown</string>
+    <string name="undo_last_swipe">Undo Last Swipe</string>
+    <string name="keep">KEEP 💚</string>
+    <string name="trash">TRASH 🗑️</string>
+    <string name="item_moved_to_trash">Item moved to Trash • Tap to Undo</string>
+    <string name="item_of_count">Item %1$d of %2$d</string>
+    <string name="sort_label">SORT:</string>
+    <string name="items_pending">%1$d items pending</string>
+    <string name="swipe_clean_btn">SWIPE CLEAN</string>
+    <string name="clean_status">Clean! ✨</string>
 </resources>

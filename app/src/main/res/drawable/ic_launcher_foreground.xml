@@ -1,22 +1,88 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <!-- Centered within 66dp safe zone (21..87) -->
-    <!-- Photo card 1 behind -->
+
+    <!-- Back Photo Card (Slightly tilted/offset, semi-transparent white/cyan) -->
     <path
-        android:fillColor="#80FFFFFF"
-        android:pathData="M32,32h38c2.2,0 4,1.8 4,4v38c0,2.2 -1.8,4 -4,4H32c-2.2,0 -4,-1.8 -4,-4V36c0,-2.2 1.8,-4 4,-4z" />
-    <!-- Photo card 2 front (rotated sweep) -->
+        android:fillColor="#4D38BDF8"
+        android:strokeColor="#80FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M26,38h38c2.2,0 4,1.8 4,4v38c0,2.2 -1.8,4 -4,4H26c-2.2,0 -4,-1.8 -4,-4V42c0,-2.2 1.8,-4 4,-4z" />
+
+    <!-- Front Photo Card Frame (Solid crisp white) -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M38,26h38c2.2,0 4,1.8 4,4v38c0,2.2 -1.8,4 -4,4H38c-2.2,0 -4,-1.8 -4,-4V30c0,-2.2 1.8,-4 4,-4z" />
-    <!-- Broom / Sparkle accent -->
+        android:pathData="M38,26h40c2.2,0 4,1.8 4,4v40c0,2.2 -1.8,4 -4,4H38c-2.2,0 -4,-1.8 -4,-4V30c0,-2.2 1.8,-4 4,-4z" />
+
+    <!-- Inner Photo Content: Sky/Background (Warm gradient) -->
+    <path
+        android:pathData="M38,30h40v30H38z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="38"
+                android:startY="30"
+                android:endX="78"
+                android:endY="60"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFF59E0B" /> <!-- Warm Orange -->
+                <item android:offset="1.0" android:color="#FFEF4444" /> <!-- Red Sunset -->
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner Photo Content: Sun (Golden Yellow) -->
+    <path
+        android:fillColor="#FFFFF176"
+        android:pathData="M58,45m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+
+    <!-- Inner Photo Content: Mountains (Dark Silhouettes) -->
+    <path
+        android:fillColor="#FF374151"
+        android:pathData="M38,60l12,-15l10,11l12,-16l6,20z" />
+
+    <!-- Bottom border/caption area of polaroid -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M38,60h40v10H38z" />
+
+    <!-- Sweep Sparkles: Primary Sweep Magic (Cyan/Neon Blue) -->
+    <!-- Large spark top right -->
+    <path
+        android:fillColor="#FF06B6D4"
+        android:pathData="M84,18l2.5,-5.5l2.5,5.5l5.5,2.5l-5.5,2.5l-2.5,5.5l-2.5,-5.5l-5.5,-2.5z" />
+
+    <!-- Medium spark center top -->
+    <path
+        android:fillColor="#FF22C55E"
+        android:pathData="M52,14l1.5,-3.5l1.5,3.5l3.5,1.5l-3.5,1.5l-1.5,3.5l-1.5,-3.5l-3.5,-1.5z" />
+
+    <!-- Broom Sweep/Magic Wave (Arc of pure energy cleaning the photo) -->
+    <path
+        android:pathData="M30,76C48,76 68,66 84,48">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="30"
+                android:startY="76"
+                android:endX="84"
+                android:endY="48"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#0038BDF8" /> <!-- Transparent Cyan -->
+                <item android:offset="0.5" android:color="#FF38BDF8" /> <!-- Cyan -->
+                <item android:offset="1.0" android:color="#FFE0F2FE" /> <!-- Bright White-blue -->
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Stylized Broom bristles / Magic wand head -->
     <path
         android:fillColor="#FF38BDF8"
-        android:pathData="M68,22l3,-8l3,8l8,3l-8,3l-3,8l-3,-8l-8,-3z" />
+        android:pathData="M84,48l1,-6l4,4z" />
     <path
-        android:fillColor="#FF34D399"
-        android:pathData="M28,68l2,-5l2,5l5,2l-5,2l-2,5l-2,-5l-5,-2z" />
+        android:fillColor="#FF22C55E"
+        android:pathData="M24,78l2,-5l2,5l5,2l-5,2l-2,5l-2,-5l-5,-2z" />
+
 </vector>

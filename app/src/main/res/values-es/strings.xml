@@ -1,0 +1,127 @@
+<resources>
+    <string name="app_name">SnapSweep</string>
+    <string name="clean_storage">Limpiar Almacenamiento</string>
+    <string name="duplicate_photos">Fotos Duplicadas</string>
+    <string name="screenshots">Capturas de Pantalla</string>
+    <string name="blurry_photos">Fotos Borrosas</string>
+    <string name="large_files">Archivos Grandes</string>
+    <string name="similar_photos">Fotos Similares</string>
+    <string name="documents">Documentos</string>
+    <string name="swipe_cleaner">Limpiador Deslizable</string>
+    <string name="settings">Ajustes</string>
+    <string name="free_up_space">Liberar Espacio</string>
+    <string name="storage_used">Almacenamiento Usado</string>
+    <string name="permission_required">Permiso Requerido</string>
+    <string name="grant_permission">Otorgar Permiso</string>
+
+    <string name="monthly_cleanup_report">Informe Mensual de Limpieza</string>
+    <string name="cleanup_streak">Racha de Limpieza</string>
+    <string name="auto_purge">Depuración Automática de Eliminados</string>
+    <string name="auto_purge_desc">Eliminar automáticamente de la papelera tras 30 días</string>
+    <string name="total_space_freed">Espacio Total Liberado</string>
+    <string name="share_report">Compartir Informe</string>
+    <string name="close">Cerrar</string>
+    <string name="view">Ver</string>
+    <string name="sort_by">Ordenar Por</string>
+    <string name="highest_clutter">Mayor Desorden</string>
+    <string name="largest_first">Más Grandes Primero</string>
+    <string name="newest_first">Más Recientes Primero</string>
+    <string name="oldest_first">Más Antiguos Primero</string>
+
+    <!-- Privacidad -->
+    <string name="privacy_info_title">Información de Privacidad y Confianza</string>
+    <string name="privacy_info_subtitle">Escaneo Local de Fotos 100% en el Dispositivo</string>
+    <string name="privacy_on_device_title">Cero Cargas a Servidores</string>
+    <string name="privacy_on_device_desc">Todo el análisis de fotos, duplicados y fotos borrosas se realiza localmente en el dispositivo. Sus fotos nunca salen a servidores externos.</string>
+    <string name="privacy_files_scanned_title">Archivos Locales Escaneados</string>
+    <string name="privacy_files_scanned_desc">SnapSweep escanea imágenes de MediaStore local, capturas de pantalla y fotos borrosas solo para organizar la limpieza.</string>
+    <string name="privacy_permissions_title">Permisos del Sistema</string>
+    <string name="privacy_permissions_desc">El permiso de imágenes se utiliza únicamente para leer metadatos de archivos locales y generar miniaturas.</string>
+    <string name="privacy_guarantee_title">Garantía de Seguridad de Datos</string>
+    <string name="privacy_guarantee_desc">No se recopilan ni comparten análisis personales o telemetría de fotos con terceros.</string>
+
+    <!-- Ahorro de Energía -->
+    <string name="power_saving_title">Protección de Ahorro de Batería</string>
+    <string name="power_saving_desc">Pausar tareas de escaneo en segundo plano cuando la batería es inferior al 20%</string>
+    <string name="power_saving_status_active">Ahorro Activo: Tareas pausadas (&lt;20% de batería)</string>
+    <string name="power_saving_status_normal">Batería Normal: Tareas en segundo plano activas</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title_1">Recupera Espacio en Segundos</string>
+    <string name="onboarding_sub_1">SnapSweep detecta automáticamente fotos borrosas, capturas antiguas, ráfagas duplicadas y videos gigantescos.</string>
+    <string name="onboarding_badge_1">LIMPIADOR INTELIGENTE</string>
+    
+    <string name="onboarding_title_2">100% en el Dispositivo y Privado</string>
+    <string name="onboarding_sub_2">Tus fotos y recuerdos privados nunca salen de tu teléfono. Todo el análisis se ejecuta de manera local y offline.</string>
+    <string name="onboarding_badge_2">SIN CARGAS EN LA NUBE</string>
+    
+    <string name="onboarding_title_3">Desliza a la Izquierda para Borrar, Derecha para Guardar</string>
+    <string name="onboarding_sub_3">Revisar el desorden es tan fácil como deslizar. Los elementos eliminados van a una papelera de revisión antes de borrarse.</string>
+    <string name="onboarding_badge_3">LIMPIEZA DESLIZABLE RÁPIDA</string>
+    
+    <string name="onboarding_title_4">Acceso Seguro al Almacenamiento</string>
+    <string name="onboarding_sub_4">Para analizar fotos borrosas, duplicados y capturas offline, SnapSweep necesita permiso de lectura local.</string>
+    <string name="onboarding_badge_4">PERMISO DE ALMACENAMIENTO</string>
+    
+    <string name="skip">Omitir</string>
+    <string name="back">Atrás</string>
+    <string name="get_started">Comenzar</string>
+    <string name="next">Siguiente</string>
+    <string name="access_approved">Acceso Aprobado ✓</string>
+    <string name="grant_storage_access">Otorgar Acceso al Almacenamiento</string>
+
+    <!-- Media Categories -->
+    <string name="category_old_screenshots_title">Capturas Antiguas</string>
+    <string name="category_old_screenshots_desc">Capturadas hace más de 30 días</string>
+    <string name="category_blurry_photos_title">Fotos Borrosas</string>
+    <string name="category_blurry_photos_desc">Baja nitidez detectada</string>
+    <string name="category_similar_bursts_title">Similares y Ráfagas</string>
+    <string name="category_similar_bursts_desc">Tomas casi idénticas tomadas con segundos de diferencia</string>
+    <string name="category_receipts_docs_title">Recibos y Documentos</string>
+    <string name="category_receipts_docs_desc">Papeles temporales, facturas y notas</string>
+    <string name="category_travel_title">Viajes y Escapadas</string>
+    <string name="category_travel_desc">Vacaciones, paisajes y monumentos al aire libre</string>
+    <string name="category_food_title">Comida y Restaurantes</string>
+    <string name="category_food_desc">Platos preparados, café y fotos de restaurantes</string>
+    <string name="category_pets_title">Mascotas y Animales</string>
+    <string name="category_pets_desc">Perros, gatos y compañeros peludos</string>
+    <string name="category_heavy_media_title">Archivos Pesados</string>
+    <string name="category_heavy_media_desc">Videos y grabaciones grandes &gt; 50MB</string>
+    <string name="category_on_this_day_title">Un día como hoy</string>
+    <string name="category_on_this_day_desc">Recuerdos capturados en esta fecha en años anteriores</string>
+
+    <!-- Additional UI Components -->
+    <string name="batch_delete_mode">MODO ELIMINACIÓN POR LOTES</string>
+    <string name="local_gallery">GALERÍA LOCAL</string>
+    <string name="select_multiple">Seleccionar varios</string>
+    <string name="group_by">Agrupar por:</string>
+    <string name="photos_selected">%1$d fotos seleccionadas</string>
+    <string name="to_free">%1$s para liberar</string>
+    <string name="delete_selected">Eliminar seleccionados</string>
+    <string name="delete_selected_title">¿Eliminar fotos seleccionadas?</string>
+    <string name="delete_selected_confirm">¿Está seguro de que desea eliminar permanentemente estas %1$d fotos de su dispositivo? Esta acción no se puede deshacer.</string>
+    <string name="delete_button">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+
+    <string name="all_clean">¡TODO LIMPIO!</string>
+    <string name="all_reviewed">Todas las fotos de esta categoría han sido revisadas.</string>
+    <string name="scan_library_again">Escanear galería de nuevo</string>
+    <string name="media_properties">Propiedades del archivo</string>
+    <string name="filename">Nombre de archivo</string>
+    <string name="path">Ruta</string>
+    <string name="date_taken">Fecha de captura</string>
+    <string name="resolution">Resolución</string>
+    <string name="file_size">Tamaño de archivo</string>
+    <string name="category">Categoría</string>
+    <string name="blur_metric">Métrica de borrosidad</string>
+    <string name="unknown">Desconocido</string>
+    <string name="undo_last_swipe">Deshacer último deslizamiento</string>
+    <string name="keep">CONSERVAR 💚</string>
+    <string name="trash">ELIMINAR 🗑️</string>
+    <string name="item_moved_to_trash">Elemento movido a la papelera • Toca para deshacer</string>
+    <string name="item_of_count">Elemento %1$d de %2$d</string>
+    <string name="sort_label">ORDENAR:</string>
+    <string name="items_pending">%1$d elementos pendientes</string>
+    <string name="swipe_clean_btn">DESLIZAR PARA LIMPIAR</string>
+    <string name="clean_status">¡Limpio! ✨</string>
+</resources>

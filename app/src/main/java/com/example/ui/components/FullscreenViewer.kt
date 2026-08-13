@@ -42,6 +42,9 @@ import com.example.ui.theme.RoseTrash
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 
+import androidx.compose.ui.res.stringResource
+import com.example.R
+
 @Composable
 fun FullscreenViewer(
     item: MediaItem,
@@ -88,7 +91,7 @@ fun FullscreenViewer(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "${item.category.title} • ${item.formattedSize}",
+                        text = "${stringResource(item.category.titleResId)} • ${item.formattedSize}",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White
                     )
@@ -102,7 +105,7 @@ fun FullscreenViewer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.close),
                         tint = Color.White
                     )
                 }
