@@ -27,6 +27,8 @@ import com.example.ui.components.PendingTrashSheet
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.OnboardingScreen
 import com.example.ui.screens.SwipeCleanerScreen
+import com.example.ui.screens.ScanResultsScreen
+import com.example.ui.components.CleanupCompleteDialog
 import com.example.ui.theme.SnapSweepTheme
 import com.example.ui.viewmodel.MainViewModel
 
@@ -164,6 +166,14 @@ class MainActivity : ComponentActivity() {
                         onOpenTrashSheet = { viewModel.setShowTrashSheet(true) },
                         onScanAgain = { viewModel.scan(context) }
                     )
+                } else if (uiState.showScanResultsScreen) {
+                    ScanResultsScreen(
+                        categories = uiState.categories,
+                        onDeleteCategory = { category ->
+                            viewModel.deleteCategoryItemsDirectly(context, category)
+                        },
+                        onBack = { viewModel.setShowScanResultsScreen(false) }
+                    )
                 } else {
                     DashboardScreen(
                         stats = uiState.stats,
@@ -189,7 +199,15 @@ class MainActivity : ComponentActivity() {
                         onOpenMonthlyReport = { viewModel.setShowMonthlyReportDialog(true) },
                         onOpenBulkCleanDialog = { viewModel.setShowBulkCleanDialog(true) },
                         onConfirmBulkClean = { viewModel.bulkCleanCategories() },
-                        onDismissBulkCleanDialog = { viewModel.setShowBulkCleanDialog(false) }
+                        onDismissBulkCleanDialog = { viewModel.setShowBulkCleanDialog(false) },
+                        onOpenScanResults = { viewModel.setShowScanResultsScreen(true) }
+                    )
+                }
+
+                // Cleanup Complete Celebration Dialog
+                if (uiState.showCleanupCompleteDialog) {
+                    CleanupCompleteDialog(
+                        onDismiss = { viewModel.dismissCleanupCompleteDialog() }
                     )
                 }
 

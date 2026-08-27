@@ -67,7 +67,9 @@ data class MainUiState(
     val hasSeenGestureGuide: Boolean = false,
     val weeklyWorkerMessage: String? = null,
     val cleanupStreakDays: Int = 3,
-    val lastCleanupDateMillis: Long = System.currentTimeMillis()
+    val lastCleanupDateMillis: Long = System.currentTimeMillis(),
+    val showScanResultsScreen: Boolean = false,
+    val showCleanupCompleteDialog: Boolean = false
 )
 
 class MainViewModel(
@@ -81,6 +83,87 @@ class MainViewModel(
 
     init {
         observeStats()
+    }
+
+    fun setShowScanResultsScreen(show: Boolean) {
+        _uiState.update { it.copy(showScanResultsScreen = show) }
+    }
+
+    fun dismissCleanupCompleteDialog() {
+        _uiState.update { it.copy(showCleanupCompleteDialog = false) }
+    }
+
+    fun deleteCategoryItemsDirectly(context: Context, category: MediaCategory) {
+        val categorySummary = _uiState.value.categories.firstOrNull { it.category == category } ?: return
+        val itemsToDelete = categorySummary.items
+        if (itemsToDelete.isEmpty()) return
+
+        val sampleItems = itemsToDelete.filter { it.isSample }
+        val realItems = itemsToDelete.filter { !it.isSample }
+
+        viewModelScope.launch {
+            if (sampleItems.isNotEmpty()) {
+                var freedBytes = 0L
+                val records = mutableListOf<CleanupRecordEntity>()
+
+                for (item in sampleItems) {
+                    freedBytes += item.sizeBytes
+                    records.add(
+                        CleanupRecordEntity(
+                            mediaId = item.id,
+                            categoryName = item.category.name,
+                            sizeBytes = item.sizeBytes,
+                            cleanedAtMillis = System.currentTimeMillis()
+                        )
+                    )
+                    try {
+                        item.uri.path?.let { File(it).delete() }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                val currentStats = cleanupDao.getUserStats() ?: UserStatsEntity()
+                val newStats = UserStatsEntity(
+                    id = 1,
+                    totalBytesFreed = currentStats.totalBytesFreed + freedBytes,
+                    totalItemsCleaned = currentStats.totalItemsCleaned + sampleItems.size,
+                    lastCleanupMillis = System.currentTimeMillis()
+                )
+
+                cleanupDao.insertCleanupRecords(records)
+                cleanupDao.insertOrUpdateUserStats(newStats)
+                
+                _uiState.update { state ->
+                    state.copy(
+                        userNotification = "Cleaned ${sampleItems.size} sample items",
+                        showCleanupCompleteDialog = true
+                    )
+                }
+            }
+
+            if (realItems.isNotEmpty()) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    try {
+                        val uris = realItems.map { it.uri }
+                        val pendingIntent = android.provider.MediaStore.createDeleteRequest(context.contentResolver, uris)
+                        _uiState.update { state ->
+                            state.copy(
+                                pendingDeleteIntentSender = pendingIntent.intentSender,
+                                pendingDeleteItems = realItems
+                            )
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        performDirectDeletion(context, realItems)
+                    }
+                } else {
+                    performDirectDeletion(context, realItems)
+                }
+            } else {
+                scan(context)
+            }
+        }
     }
 
     private fun observeStats() {
@@ -449,7 +532,8 @@ class MainViewModel(
                     val remainingTrash = state.pendingTrash.filter { !sampleItems.contains(it) }
                     state.copy(
                         pendingTrash = remainingTrash,
-                        userNotification = "Cleaned ${sampleItems.size} sample items"
+                        userNotification = "Cleaned ${sampleItems.size} sample items",
+                        showCleanupCompleteDialog = true
                     )
                 }
             }
@@ -534,7 +618,8 @@ class MainViewModel(
                 showTrashSheet = false,
                 userNotification = "Cleaned ${records.size} items",
                 activeCategory = null,
-                activeQueue = emptyList()
+                activeQueue = emptyList(),
+                showCleanupCompleteDialog = true
             )
         }
         scan(context)
@@ -579,7 +664,8 @@ class MainViewModel(
                     showTrashSheet = false,
                     userNotification = msg,
                     activeCategory = null,
-                    activeQueue = emptyList()
+                    activeQueue = emptyList(),
+                    showCleanupCompleteDialog = true
                 )
             }
 

@@ -110,6 +110,7 @@ fun DashboardScreen(
     onOpenBulkCleanDialog: () -> Unit = {},
     onConfirmBulkClean: () -> Unit = {},
     onDismissBulkCleanDialog: () -> Unit = {},
+    onOpenScanResults: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -306,6 +307,12 @@ fun DashboardScreen(
                             onRequestPermission = onRequestPermission
                         )
 
+                        ScanResultsSummaryCard(
+                            onViewResults = onOpenScanResults,
+                            screenshotsCount = screenshotsSummary?.count ?: 0,
+                            duplicatesCount = (categories.firstOrNull { it.category == MediaCategory.SIMILAR_BURSTS }?.count ?: 0)
+                        )
+
                         if (onThisDaySummary != null && onThisDaySummary.count > 0) {
                             OnThisDayCard(
                                 summary = onThisDaySummary,
@@ -409,6 +416,15 @@ fun DashboardScreen(
                     // Monthly Report Card
                     item {
                         MonthlyReportCard(onOpenReport = onOpenMonthlyReport)
+                    }
+
+                    // Scan Results Card
+                    item {
+                        ScanResultsSummaryCard(
+                            onViewResults = onOpenScanResults,
+                            screenshotsCount = screenshotsSummary?.count ?: 0,
+                            duplicatesCount = (categories.firstOrNull { it.category == MediaCategory.SIMILAR_BURSTS }?.count ?: 0)
+                        )
                     }
 
                     // Gallery Permission Status / Request Card
@@ -866,6 +882,92 @@ fun MonthlyReportCard(
             ) {
                 Text(
                     text = "VIEW",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ScanResultsSummaryCard(
+    onViewResults: () -> Unit,
+    screenshotsCount: Int,
+    duplicatesCount: Int,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            1.dp,
+            Brush.horizontalGradient(
+                colors = listOf(CyanPrimary, Color(0xFF8B5CF6))
+            )
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onViewResults() }
+            .testTag("scan_results_summary_card")
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF8B5CF6).copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteSweep,
+                        contentDescription = "Scan Summary",
+                        tint = Color(0xFF8B5CF6),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "DETAILED SCAN RESULTS",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Grouped: $screenshotsCount Screenshots • $duplicatesCount Duplicates",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = onViewResults,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF8B5CF6),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .height(36.dp)
+                    .testTag("view_detailed_scan_results_button")
+            ) {
+                Text(
+                    text = "ANALYZE",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
