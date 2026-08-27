@@ -124,4 +124,61 @@
     <string name="items_pending">%1$d éléments en attente</string>
     <string name="swipe_clean_btn">BALAYER POUR NETTOYER</string>
     <string name="clean_status">Propre ! ✨</string>
+
+    <!-- Selection & Filter Strings -->
+    <string name="select_all">Tout Sélectionner</string>
+    <string name="deselect_all">Tout Désélectionner</string>
+    <string name="select_filtered">Sélectionner Filtrés</string>
+    <string name="select_low_quality">Sélectionner Basse Qualité</string>
+    <string name="filter_by">Filtrer :</string>
+    <string name="filter_all">Tous</string>
+    <string name="filter_low_quality">Basse Qualité</string>
+    <string name="filter_screenshots">Captures</string>
+    <string name="filter_large_files">Fichiers Lourds</string>
+    <string name="filter_duplicates">Doublons</string>
+    <string name="no_photos_match_filter">Aucune photo ne correspond au filtre sélectionné.</string>
+    <string name="low_quality_badge">Basse Rés</string>
+    <string name="screenshot_badge">Capture</string>
+    <string name="group_date_taken">Date</string>
+    <string name="group_app_origin">Application</string>
+    <string name="group_all">Tous</string>
+    <string name="loading_photos_gallery">Chargement des photos de la galerie…</string>
+    <string name="no_photos_gallery_title">Aucune photo trouvée dans la galerie</string>
+    <string name="no_photos_gallery_desc">Assurez-vous que l\'autorisation d\'accès à la galerie est accordée.</string>
+    <string name="dimensions_label">Dimensions : %1$d × %2$d px</string>
+    <string name="size_label">Taille : %1$s</string>
+
+    <!-- Storage Distribution Circular Chart -->
+    <string name="storage_distribution_title">Répartition du Stockage</string>
+    <string name="storage_distribution_subtitle">Captures vs Autres Catégories</string>
+    <string name="storage_chart_screenshots">Captures d\'Écran</string>
+    <string name="storage_chart_duplicates">Similaires &amp; Rafales</string>
+    <string name="storage_chart_blurry">Floues &amp; Basse Rés</string>
+    <string name="storage_chart_heavy">Fichiers Volumineux</string>
+    <string name="storage_chart_other">Autres Fichiers</string>
+    <string name="storage_chart_total">Total Analysé</string>
+    <string name="storage_chart_screenshots_share">%1$.1f%% Captures</string>
+
+    <!-- Weekly Background Worker Scan -->
+    <string name="weekly_scan_title">Analyse Hebdomadaire des Doublons</string>
+    <string name="weekly_scan_desc">La tâche WorkManager s\'exécute chaque semaine pour analyser les captures en double et optimiser le stockage.</string>
+    <string name="weekly_scan_notification_title">🧹 Nettoyage Hebdomadaire SnapSweep</string>
+    <string name="weekly_scan_notification_body">%1$d éléments encombrants trouvés (%2$d captures, %3$d photos floues). Nettoyez maintenant pour optimiser l\'espace !</string>
+    <string name="auto_scheduled_status">Scan Hebdomadaire : Actif (Tous les 7 Jours)</string>
+    <string name="run_weekly_scan_now">Lancer l\'Analyse</string>
+    <string name="weekly_scan_completed">Analyse hebdomadaire terminée avec succès.</string>
+    <string name="scan_summary_title">Résumé de l\'Analyse</string>
+    <string name="smart_cleanup_queues">FILES DE NETTOYAGE INTELLIGENT</string>
+    <string name="offline_ai_badge">IA 100% Hors Ligne</string>
+    <string name="local_gallery_preview">APERÇU DE LA GALERIE LOCALE</string>
+    <string name="content_resolver_badge">Grille ContentResolver</string>
+    <string name="one_tap_bulk_clean">NETTOYAGE EN 1 CLIC</string>
+    <string name="pending_trash_queue">FILE D\'ATTENTE CORBEILLE</string>
+    <string name="items_to_free_count">%1$d éléments • %2$s à libérer</string>
+    <string name="purge_button">PURGER</string>
+    <string name="bulk_delete_prompt">Supprimer %1$d photos inutiles</string>
+    <string name="screenshots_and_blurry_detected">Captures et photos floues détectées</string>
+    <string name="clean_now_btn">NETTOYER</string>
+    <string name="total_clutter">Encombrement Total</string>
+    <string name="found_deletable_files">%1$d fichiers supprimables trouvés</string>
 </resources>

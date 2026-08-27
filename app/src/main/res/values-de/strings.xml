@@ -124,4 +124,61 @@
     <string name="items_pending">%1$d Elemente ausstehend</string>
     <string name="swipe_clean_btn">WISCHEN &amp; REINIGEN</string>
     <string name="clean_status">Sauber! ✨</string>
+
+    <!-- Selection & Filter Strings -->
+    <string name="select_all">Alle Auswählen</string>
+    <string name="deselect_all">Alle Abwählen</string>
+    <string name="select_filtered">Gefilterte Auswählen</string>
+    <string name="select_low_quality">Geringe Qualität Auswählen</string>
+    <string name="filter_by">Filtern:</string>
+    <string name="filter_all">Alle</string>
+    <string name="filter_low_quality">Geringe Qualität</string>
+    <string name="filter_screenshots">Screenshots</string>
+    <string name="filter_large_files">Große Dateien</string>
+    <string name="filter_duplicates">Duplikate</string>
+    <string name="no_photos_match_filter">Keine Fotos entsprechen dem ausgewählten Filter.</string>
+    <string name="low_quality_badge">Geringe Aufl.</string>
+    <string name="screenshot_badge">Screenshot</string>
+    <string name="group_date_taken">Aufnahmedatum</string>
+    <string name="group_app_origin">App-Quelle</string>
+    <string name="group_all">Alle</string>
+    <string name="loading_photos_gallery">Fotos aus Galerie laden…</string>
+    <string name="no_photos_gallery_title">Keine Fotos in Galerie gefunden</string>
+    <string name="no_photos_gallery_desc">Stellen Sie sicher, dass die Galerie-Berechtigung erteilt ist.</string>
+    <string name="dimensions_label">Abmessungen: %1$d × %2$d px</string>
+    <string name="size_label">Größe: %1$s</string>
+
+    <!-- Storage Distribution Circular Chart -->
+    <string name="storage_distribution_title">Speicherverteilung</string>
+    <string name="storage_distribution_subtitle">Screenshots vs. Andere Kategorien</string>
+    <string name="storage_chart_screenshots">Screenshots</string>
+    <string name="storage_chart_duplicates">Ähnliche &amp; Serien</string>
+    <string name="storage_chart_blurry">Unscharf &amp; Geringe Aufl.</string>
+    <string name="storage_chart_heavy">Große Medien</string>
+    <string name="storage_chart_other">Andere Medien</string>
+    <string name="storage_chart_total">Gesamt Analysiert</string>
+    <string name="storage_chart_screenshots_share">%1$.1f%% Screenshots</string>
+
+    <!-- Weekly Background Worker Scan -->
+    <string name="weekly_scan_title">Wöchentlicher Duplikat-Scan</string>
+    <string name="weekly_scan_desc">Hintergrundaufgabe scannt wöchentlich nach doppelten Screenshots für optimale Speicherbereinigung.</string>
+    <string name="weekly_scan_notification_title">🧹 Wöchentliche SnapSweep-Bereinigung</string>
+    <string name="weekly_scan_notification_body">%1$d ungenutzte Elemente gefunden (%2$d Screenshots, %3$d unscharfe Fotos). Jetzt bereinigen!</string>
+    <string name="auto_scheduled_status">Wöchentlicher Scan: Aktiv (Alle 7 Tage)</string>
+    <string name="run_weekly_scan_now">Scan Jetzt Starten</string>
+    <string name="weekly_scan_completed">Wöchentlicher Scan erfolgreich abgeschlossen.</string>
+    <string name="scan_summary_title">Scan-Zusammenfassung</string>
+    <string name="smart_cleanup_queues">INTELLIGENTE REINIGUNGSWARTESCHLANGE</string>
+    <string name="offline_ai_badge">100% Offline-KI</string>
+    <string name="local_gallery_preview">LOKALE GALERIEVORSCHAU</string>
+    <string name="content_resolver_badge">ContentResolver-Raster</string>
+    <string name="one_tap_bulk_clean">1-TIPPER-MASSENREINIGUNG</string>
+    <string name="pending_trash_queue">AUSSTEHENDER PAPIERKORB</string>
+    <string name="items_to_free_count">%1$d Elemente • %2$s freizugeben</string>
+    <string name="purge_button">BEREINIGEN</string>
+    <string name="bulk_delete_prompt">%1$d unnötige Fotos löschen</string>
+    <string name="screenshots_and_blurry_detected">Screenshots und unscharfe Fotos erkannt</string>
+    <string name="clean_now_btn">JETZT REINIGEN</string>
+    <string name="total_clutter">Gesamter Datenmüll</string>
+    <string name="found_deletable_files">%1$d löschbare Dateien gefunden</string>
 </resources>

@@ -82,6 +82,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Surface
+import androidx.compose.ui.res.stringResource
+import com.example.R
+import com.example.ui.components.StorageDistributionChart
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,6 +113,7 @@ fun DashboardScreen(
     onOpenBulkCleanDialog: () -> Unit = {},
     onConfirmBulkClean: () -> Unit = {},
     onDismissBulkCleanDialog: () -> Unit = {},
+    onOpenScanResults: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -241,7 +245,7 @@ fun DashboardScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "PENDING TRASH QUEUE",
+                                        text = stringResource(R.string.pending_trash_queue),
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             fontWeight = FontWeight.Bold,
                                             letterSpacing = 1.sp
@@ -249,7 +253,7 @@ fun DashboardScreen(
                                         color = Color.White.copy(alpha = 0.8f)
                                     )
                                     Text(
-                                        text = "${pendingTrash.size} items • $formattedTrashSize to free",
+                                        text = stringResource(R.string.items_to_free_count, pendingTrash.size, formattedTrashSize),
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                         color = Color.White
                                     )
@@ -263,7 +267,7 @@ fun DashboardScreen(
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(
-                                    text = "PURGE",
+                                    text = stringResource(R.string.purge_button),
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black),
                                     color = RoseTrash
                                 )
@@ -287,7 +291,7 @@ fun DashboardScreen(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Left Pane: Core stats & status
+                    // Left Pane: Core stats, circular storage distribution chart & status
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -300,10 +304,19 @@ fun DashboardScreen(
                             scanProgress = scanProgress
                         )
 
+                        // Circular Storage Distribution Chart
+                        StorageDistributionChart(categories = categories)
+
                         GalleryPermissionCard(
                             hasImagesPermission = hasImagesPermission,
                             hasVideosPermission = hasVideosPermission,
                             onRequestPermission = onRequestPermission
+                        )
+
+                        ScanResultsSummaryCard(
+                            onViewResults = onOpenScanResults,
+                            screenshotsCount = screenshotsSummary?.count ?: 0,
+                            duplicatesCount = (categories.firstOrNull { it.category == MediaCategory.SIMILAR_BURSTS }?.count ?: 0)
                         )
 
                         if (onThisDaySummary != null && onThisDaySummary.count > 0) {
@@ -329,7 +342,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "SMART CLEANUP QUEUES",
+                                text = stringResource(R.string.smart_cleanup_queues),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -337,7 +350,7 @@ fun DashboardScreen(
                                 color = TextMuted
                             )
                             Text(
-                                text = "100% Offline AI",
+                                text = stringResource(R.string.offline_ai_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -358,7 +371,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "LOCAL GALLERY PREVIEW",
+                                text = stringResource(R.string.local_gallery_preview),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -366,7 +379,7 @@ fun DashboardScreen(
                                 color = TextMuted
                             )
                             Text(
-                                text = "ContentResolver Grid",
+                                text = stringResource(R.string.content_resolver_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -401,6 +414,11 @@ fun DashboardScreen(
                         )
                     }
 
+                    // Circular Storage Distribution Chart
+                    item {
+                        StorageDistributionChart(categories = categories)
+                    }
+
                     // Cleanup Streak Tracker Card
                     item {
                         CleanupStreakCard(streakDays = cleanupStreakDays)
@@ -409,6 +427,15 @@ fun DashboardScreen(
                     // Monthly Report Card
                     item {
                         MonthlyReportCard(onOpenReport = onOpenMonthlyReport)
+                    }
+
+                    // Scan Results Card
+                    item {
+                        ScanResultsSummaryCard(
+                            onViewResults = onOpenScanResults,
+                            screenshotsCount = screenshotsSummary?.count ?: 0,
+                            duplicatesCount = (categories.firstOrNull { it.category == MediaCategory.SIMILAR_BURSTS }?.count ?: 0)
+                        )
                     }
 
                     // Gallery Permission Status / Request Card
@@ -477,7 +504,7 @@ fun DashboardScreen(
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Column {
                                             Text(
-                                                text = "ONE-TAP BULK CLEAN",
+                                                text = stringResource(R.string.one_tap_bulk_clean),
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     fontWeight = FontWeight.Bold,
                                                     letterSpacing = 1.sp
@@ -485,12 +512,12 @@ fun DashboardScreen(
                                                 color = RoseTrash
                                             )
                                             Text(
-                                                text = "Bulk Delete $bulkCleanItemCount Junk Photos",
+                                                text = stringResource(R.string.bulk_delete_prompt, bulkCleanItemCount),
                                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                                 color = Color.White
                                             )
                                             Text(
-                                                text = "Screenshots & blurry photos detected",
+                                                text = stringResource(R.string.screenshots_and_blurry_detected),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = Color.LightGray
                                             )
@@ -504,7 +531,7 @@ fun DashboardScreen(
                                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = "CLEAN NOW",
+                                            text = stringResource(R.string.clean_now_btn),
                                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black),
                                             color = Color.White
                                         )
@@ -524,7 +551,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "SMART CLEANUP QUEUES",
+                                text = stringResource(R.string.smart_cleanup_queues),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -533,7 +560,7 @@ fun DashboardScreen(
                             )
 
                             Text(
-                                text = "100% Offline AI",
+                                text = stringResource(R.string.offline_ai_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -558,7 +585,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "LOCAL GALLERY PREVIEW",
+                                text = stringResource(R.string.local_gallery_preview),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -567,7 +594,7 @@ fun DashboardScreen(
                             )
 
                             Text(
-                                text = "ContentResolver Grid",
+                                text = stringResource(R.string.content_resolver_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -866,6 +893,92 @@ fun MonthlyReportCard(
             ) {
                 Text(
                     text = "VIEW",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ScanResultsSummaryCard(
+    onViewResults: () -> Unit,
+    screenshotsCount: Int,
+    duplicatesCount: Int,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            1.dp,
+            Brush.horizontalGradient(
+                colors = listOf(CyanPrimary, Color(0xFF8B5CF6))
+            )
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onViewResults() }
+            .testTag("scan_results_summary_card")
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF8B5CF6).copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteSweep,
+                        contentDescription = "Scan Summary",
+                        tint = Color(0xFF8B5CF6),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "DETAILED SCAN RESULTS",
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Grouped: $screenshotsCount Screenshots • $duplicatesCount Duplicates",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = onViewResults,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF8B5CF6),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .height(36.dp)
+                    .testTag("view_detailed_scan_results_button")
+            ) {
+                Text(
+                    text = "ANALYZE",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

@@ -65,8 +65,10 @@ data class MainUiState(
     val showGestureGuideOverlay: Boolean = false,
     val hasSeenGestureGuide: Boolean = false,
     val weeklyWorkerMessage: String? = null,
-    val cleanupStreakDays: Int = 0,
-    val lastCleanupDateMillis: Long = 0L
+    val cleanupStreakDays: Int = 3,
+    val lastCleanupDateMillis: Long = System.currentTimeMillis(),
+    val showScanResultsScreen: Boolean = false,
+    val showCleanupCompleteDialog: Boolean = false
 )
 
 class MainViewModel(
@@ -80,6 +82,40 @@ class MainViewModel(
 
     init {
         observeStats()
+    }
+
+    fun setShowScanResultsScreen(show: Boolean) {
+        _uiState.update { it.copy(showScanResultsScreen = show) }
+    }
+
+    fun dismissCleanupCompleteDialog() {
+        _uiState.update { it.copy(showCleanupCompleteDialog = false) }
+    }
+
+    fun deleteCategoryItemsDirectly(context: Context, category: MediaCategory) {
+        val categorySummary = _uiState.value.categories.firstOrNull { it.category == category } ?: return
+        val itemsToDelete = categorySummary.items
+        if (itemsToDelete.isEmpty()) return
+
+        viewModelScope.launch {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                try {
+                    val uris = itemsToDelete.map { it.uri }
+                    val pendingIntent = android.provider.MediaStore.createDeleteRequest(context.contentResolver, uris)
+                    _uiState.update { state ->
+                        state.copy(
+                            pendingDeleteIntentSender = pendingIntent.intentSender,
+                            pendingDeleteItems = itemsToDelete
+                        )
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    performDirectDeletion(context, itemsToDelete)
+                }
+            } else {
+                performDirectDeletion(context, itemsToDelete)
+            }
+        }
     }
 
     private fun observeStats() {
@@ -474,7 +510,8 @@ class MainViewModel(
                 showTrashSheet = false,
                 userNotification = "Cleaned ${records.size} items",
                 activeCategory = null,
-                activeQueue = emptyList()
+                activeQueue = emptyList(),
+                showCleanupCompleteDialog = true
             )
         }
         scan(context)
@@ -519,7 +556,8 @@ class MainViewModel(
                     showTrashSheet = false,
                     userNotification = msg,
                     activeCategory = null,
-                    activeQueue = emptyList()
+                    activeQueue = emptyList(),
+                    showCleanupCompleteDialog = true
                 )
             }
 

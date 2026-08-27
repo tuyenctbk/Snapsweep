@@ -48,6 +48,10 @@ import com.example.ui.theme.LightBackground
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
 fun StorageHeader(
@@ -215,20 +219,44 @@ fun StorageHeader(
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = "Scanning MediaStore...",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = CyanPrimary
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(com.example.R.raw.clean_sweep))
+                                val lottieProgress by animateLottieCompositionAsState(
+                                    composition = lottieComposition,
+                                    iterations = 100
+                                )
+                                LottieAnimation(
+                                    composition = lottieComposition,
+                                    progress = { lottieProgress },
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "Scanning MediaStore...",
+                                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                        color = CyanPrimary
+                                    )
+                                    Text(
+                                        text = "Analyzing metadata & finding duplicates",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = TextMuted
+                                    )
+                                }
+                            }
                             Text(
                                 text = "${(animatedProgress * 100).toInt()}%",
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
                                 color = CyanPrimary
                             )
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         LinearProgressIndicator(
                             progress = { animatedProgress },
                             modifier = Modifier
