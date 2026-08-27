@@ -1,21 +1,18 @@
 package com.example.ui.components
 
-import androidx.compose.ui.res.stringResource
-import com.example.R
-
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
 import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,40 +33,37 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Collections
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,6 +71,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -85,9 +80,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.R
 import com.example.ui.theme.CyanPrimary
 import com.example.ui.theme.DarkBorder
 import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.RoseTrash
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
@@ -102,7 +100,9 @@ data class LocalPhotoItem(
     val sizeBytes: Long,
     val dateTakenMillis: Long,
     val width: Int = 0,
-    val height: Int = 0
+    val height: Int = 0,
+    val isLowQuality: Boolean = false,
+    val isScreenshot: Boolean = false
 ) {
     val formattedSize: String
         get() {
@@ -122,9 +122,14 @@ enum class GalleryGroupMode {
     DATE_TAKEN, APP_ORIGIN, ALL
 }
 
+enum class GalleryFilterMode {
+    ALL, LOW_QUALITY, SCREENSHOTS, LARGE_FILES
+}
+
 /**
  * A responsive Photo Gallery composable that queries local images using [ContentResolver]
- * and displays them in a LazyVerticalGrid layout with full-screen preview capability and grouping modes.
+ * and displays them in a LazyVerticalGrid layout with quick 'Select All', 'Select Filtered',
+ * 'Select Low-Quality', and batch deletion capabilities.
  */
 @Composable
 fun PhotoGallery(
@@ -138,6 +143,7 @@ fun PhotoGallery(
     var isLoading by remember { mutableStateOf(true) }
     var selectedPhoto by remember { mutableStateOf<LocalPhotoItem?>(null) }
     var groupMode by remember { mutableStateOf(GalleryGroupMode.DATE_TAKEN) }
+    var filterMode by remember { mutableStateOf(GalleryFilterMode.ALL) }
 
     // Multi-selection mode states
     var isSelectionMode by remember { mutableStateOf(false) }
@@ -164,11 +170,21 @@ fun PhotoGallery(
         isLoading = false
     }
 
-    // Compute grouped photos
-    val groupedPhotos = remember(photos, groupMode) {
+    // Apply active filter to photo list
+    val filteredPhotos = remember(photos, filterMode) {
+        when (filterMode) {
+            GalleryFilterMode.ALL -> photos
+            GalleryFilterMode.LOW_QUALITY -> photos.filter { it.isLowQuality }
+            GalleryFilterMode.SCREENSHOTS -> photos.filter { it.isScreenshot }
+            GalleryFilterMode.LARGE_FILES -> photos.filter { it.sizeBytes > 3L * 1024 * 1024 }
+        }
+    }
+
+    // Compute grouped photos from filtered list
+    val groupedPhotos = remember(filteredPhotos, groupMode) {
         when (groupMode) {
             GalleryGroupMode.DATE_TAKEN -> {
-                photos.groupBy { photo ->
+                filteredPhotos.groupBy { photo ->
                     val now = System.currentTimeMillis()
                     val diffDays = (now - photo.dateTakenMillis) / (1000 * 60 * 60 * 24)
                     when {
@@ -181,16 +197,16 @@ fun PhotoGallery(
                 }
             }
             GalleryGroupMode.APP_ORIGIN -> {
-                photos.groupBy { photo ->
+                filteredPhotos.groupBy { photo ->
                     when {
-                        photo.displayName.contains("screenshot", ignoreCase = true) -> "📱 Screenshots"
+                        photo.isScreenshot -> "📱 Screenshots"
                         photo.displayName.contains("WA", ignoreCase = true) || photo.displayName.contains("WhatsApp", ignoreCase = true) -> "💬 WhatsApp Media"
                         photo.displayName.contains("IMG", ignoreCase = true) || photo.displayName.contains("PXL", ignoreCase = true) -> "📸 Camera Shots"
                         else -> "📁 Downloads & Others"
                     }
                 }
             }
-            GalleryGroupMode.ALL -> mapOf("🖼️ All Photos (${photos.size})" to photos)
+            GalleryGroupMode.ALL -> mapOf("🖼️ Photos (${filteredPhotos.size})" to filteredPhotos)
         }
     }
 
@@ -216,19 +232,185 @@ fun PhotoGallery(
                 color = if (isSelectionMode) CyanPrimary else TextMuted
             )
 
-            Text(
-                text = if (isSelectionMode) stringResource(R.string.cancel) else stringResource(R.string.select_multiple),
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                color = CyanPrimary,
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isSelectionMode) {
+                    Text(
+                        text = stringResource(R.string.cancel),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .clickable {
+                                isSelectionMode = false
+                                selectedPhotos.clear()
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .testTag("gallery_cancel_selection_btn")
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.select_multiple),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                        color = CyanPrimary,
+                        modifier = Modifier
+                            .clickable { isSelectionMode = true }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .testTag("gallery_select_mode_toggle")
+                    )
+                }
+            }
+        }
+
+        // Quick Batch Selection Action Bar (Select All / Select Low Quality / Select Filtered)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Select All Button
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (isSelectionMode && selectedPhotos.size == filteredPhotos.size && filteredPhotos.isNotEmpty()) CyanPrimary else DarkSurface,
+                border = BorderStroke(1.dp, if (selectedPhotos.size == filteredPhotos.size && filteredPhotos.isNotEmpty()) CyanPrimary else DarkBorder),
                 modifier = Modifier
                     .clickable {
-                        isSelectionMode = !isSelectionMode
-                        if (!isSelectionMode) {
+                        isSelectionMode = true
+                        if (selectedPhotos.size == filteredPhotos.size) {
                             selectedPhotos.clear()
+                        } else {
+                            selectedPhotos.clear()
+                            selectedPhotos.addAll(filteredPhotos)
                         }
                     }
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .testTag("gallery_select_mode_toggle")
+                    .testTag("gallery_select_all_btn")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SelectAll,
+                        contentDescription = null,
+                        tint = if (selectedPhotos.size == filteredPhotos.size && filteredPhotos.isNotEmpty()) Color.Black else CyanPrimary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (selectedPhotos.size == filteredPhotos.size && filteredPhotos.isNotEmpty()) {
+                            stringResource(R.string.deselect_all)
+                        } else {
+                            stringResource(R.string.select_all)
+                        },
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = if (selectedPhotos.size == filteredPhotos.size && filteredPhotos.isNotEmpty()) Color.Black else TextPrimary
+                        )
+                    )
+                }
+            }
+
+            // Select Low-Quality Button (One-tap select low-quality photos for deletion)
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (selectedPhotos.isNotEmpty() && selectedPhotos.all { it.isLowQuality }) RoseTrash.copy(alpha = 0.2f) else DarkSurface,
+                border = BorderStroke(1.dp, RoseTrash.copy(alpha = 0.5f)),
+                modifier = Modifier
+                    .clickable {
+                        isSelectionMode = true
+                        val lowQualityPhotos = photos.filter { it.isLowQuality }
+                        selectedPhotos.clear()
+                        selectedPhotos.addAll(lowQualityPhotos)
+                    }
+                    .testTag("gallery_select_low_quality_btn")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(RoseTrash)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.select_low_quality),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                    )
+                }
+            }
+
+            // Select Filtered Button (If a filter is active)
+            if (filterMode != GalleryFilterMode.ALL) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = CyanPrimary.copy(alpha = 0.2f),
+                    border = BorderStroke(1.dp, CyanPrimary),
+                    modifier = Modifier
+                        .clickable {
+                            isSelectionMode = true
+                            selectedPhotos.clear()
+                            selectedPhotos.addAll(filteredPhotos)
+                        }
+                        .testTag("gallery_select_filtered_btn")
+                ) {
+                    Text(
+                        text = stringResource(R.string.select_filtered),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = CyanPrimary
+                        ),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                    )
+                }
+            }
+        }
+
+        // Filter Bar Chips
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.filter_by),
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = TextMuted
+            )
+
+            GalleryFilterChip(
+                label = stringResource(R.string.filter_all),
+                isSelected = filterMode == GalleryFilterMode.ALL,
+                onClick = { filterMode = GalleryFilterMode.ALL },
+                testTag = "filter_chip_all"
+            )
+
+            GalleryFilterChip(
+                label = stringResource(R.string.filter_low_quality),
+                isSelected = filterMode == GalleryFilterMode.LOW_QUALITY,
+                onClick = { filterMode = GalleryFilterMode.LOW_QUALITY },
+                testTag = "filter_chip_low_quality"
+            )
+
+            GalleryFilterChip(
+                label = stringResource(R.string.filter_screenshots),
+                isSelected = filterMode == GalleryFilterMode.SCREENSHOTS,
+                onClick = { filterMode = GalleryFilterMode.SCREENSHOTS },
+                testTag = "filter_chip_screenshots"
+            )
+
+            GalleryFilterChip(
+                label = stringResource(R.string.filter_large_files),
+                isSelected = filterMode == GalleryFilterMode.LARGE_FILES,
+                onClick = { filterMode = GalleryFilterMode.LARGE_FILES },
+                testTag = "filter_chip_large_files"
             )
         }
 
@@ -236,8 +418,8 @@ fun PhotoGallery(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -246,53 +428,23 @@ fun PhotoGallery(
                 color = TextMuted
             )
 
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (groupMode == GalleryGroupMode.DATE_TAKEN) CyanPrimary else DarkSurface)
-                    .clickable { groupMode = GalleryGroupMode.DATE_TAKEN }
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "Date Taken",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = if (groupMode == GalleryGroupMode.DATE_TAKEN) Color.Black else TextSecondary
-                    )
-                )
-            }
+            GalleryGroupChip(
+                label = stringResource(R.string.group_date_taken),
+                isSelected = groupMode == GalleryGroupMode.DATE_TAKEN,
+                onClick = { groupMode = GalleryGroupMode.DATE_TAKEN }
+            )
 
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (groupMode == GalleryGroupMode.APP_ORIGIN) CyanPrimary else DarkSurface)
-                    .clickable { groupMode = GalleryGroupMode.APP_ORIGIN }
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "App Origin",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = if (groupMode == GalleryGroupMode.APP_ORIGIN) Color.Black else TextSecondary
-                    )
-                )
-            }
+            GalleryGroupChip(
+                label = stringResource(R.string.group_app_origin),
+                isSelected = groupMode == GalleryGroupMode.APP_ORIGIN,
+                onClick = { groupMode = GalleryGroupMode.APP_ORIGIN }
+            )
 
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (groupMode == GalleryGroupMode.ALL) CyanPrimary else DarkSurface)
-                    .clickable { groupMode = GalleryGroupMode.ALL }
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "All",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = if (groupMode == GalleryGroupMode.ALL) Color.Black else TextSecondary
-                    )
-                )
-            }
+            GalleryGroupChip(
+                label = stringResource(R.string.group_all),
+                isSelected = groupMode == GalleryGroupMode.ALL,
+                onClick = { groupMode = GalleryGroupMode.ALL }
+            )
         }
 
         Box(modifier = Modifier.weight(1f)) {
@@ -313,13 +465,13 @@ fun PhotoGallery(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Loading photos from gallery...",
+                            text = stringResource(R.string.loading_photos_gallery),
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary
                         )
                     }
                 }
-                photos.isEmpty() -> {
+                filteredPhotos.isEmpty() -> {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -343,13 +495,21 @@ fun PhotoGallery(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No photos found in gallery",
+                            text = if (photos.isEmpty()) {
+                                stringResource(R.string.no_photos_gallery_title)
+                            } else {
+                                stringResource(R.string.no_photos_match_filter)
+                            },
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = TextPrimary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Make sure gallery access permission is granted.",
+                            text = if (photos.isEmpty()) {
+                                stringResource(R.string.no_photos_gallery_desc)
+                            } else {
+                                stringResource(R.string.filter_by)
+                            },
                             style = MaterialTheme.typography.bodySmall,
                             color = TextMuted
                         )
@@ -385,7 +545,7 @@ fun PhotoGallery(
                             items(
                                 items = sectionPhotos,
                                 key = { photo -> "${headerTitle}_${photo.id}" }
-                             ) { photo ->
+                            ) { photo ->
                                 val isSelected = selectedPhotos.any { it.id == photo.id }
                                 PhotoGridTile(
                                     photo = photo,
@@ -461,7 +621,8 @@ fun PhotoGallery(
                         Button(
                             onClick = { showDeleteConfirmation = true },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.testTag("gallery_confirm_delete_bar_btn")
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
@@ -520,6 +681,54 @@ fun PhotoGallery(
     }
 }
 
+@Composable
+private fun GalleryFilterChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    testTag: String
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (isSelected) CyanPrimary else DarkSurface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .testTag(testTag)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = if (isSelected) Color.Black else TextSecondary
+            )
+        )
+    }
+}
+
+@Composable
+private fun GalleryGroupChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (isSelected) CyanPrimary else DarkSurface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = if (isSelected) Color.Black else TextSecondary
+            )
+        )
+    }
+}
+
 suspend fun deleteLocalPhotosDirectly(context: Context, items: List<LocalPhotoItem>): Int {
     var count = 0
     withContext(Dispatchers.IO) {
@@ -553,7 +762,7 @@ private fun PhotoGridTile(
             .testTag("photo_gallery_item_${photo.id}"),
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             if (isSelected) 2.dp else 0.5.dp,
             if (isSelected) CyanPrimary else DarkBorder
         )
@@ -569,6 +778,47 @@ private fun PhotoGridTile(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
+            // Top Badges (Low Quality, Screenshot)
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (photo.isLowQuality) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFFF59E0B).copy(alpha = 0.9f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.low_quality_badge),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+                if (photo.isScreenshot) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = CyanPrimary.copy(alpha = 0.9f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.screenshot_badge),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+            }
 
             // Selection overlay and checkbox
             if (isSelectionMode) {
@@ -703,13 +953,13 @@ private fun PhotoLightboxDialog(
                 ) {
                     Column {
                         Text(
-                            text = "Size: ${photo.formattedSize}",
+                            text = stringResource(R.string.size_label, photo.formattedSize),
                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
                             color = TextPrimary
                         )
                         if (photo.width > 0 && photo.height > 0) {
                             Text(
-                                text = "Dimensions: ${photo.width} x ${photo.height} px",
+                                text = stringResource(R.string.dimensions_label, photo.width, photo.height),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = TextMuted
                             )
@@ -723,6 +973,7 @@ private fun PhotoLightboxDialog(
 
 /**
  * Helper function that queries [ContentResolver] for images stored in [MediaStore.Images.Media.EXTERNAL_CONTENT_URI].
+ * Also classifies whether a photo is a screenshot or low-quality.
  */
 suspend fun fetchLocalPhotos(context: Context): List<LocalPhotoItem> = withContext(Dispatchers.IO) {
     val photos = mutableListOf<LocalPhotoItem>()
@@ -760,6 +1011,12 @@ suspend fun fetchLocalPhotos(context: Context): List<LocalPhotoItem> = withConte
                 val height = if (heightColumn >= 0) cursor.getInt(heightColumn) else 0
                 val contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
+                val isScreenshot = name.contains("screenshot", ignoreCase = true) ||
+                        name.startsWith("Screenshot", ignoreCase = true) ||
+                        name.contains("Screen_Shot", ignoreCase = true)
+
+                val isLowQuality = ((width > 0 && width < 720) || (height > 0 && height < 720) || (size in 1..95_000))
+
                 photos.add(
                     LocalPhotoItem(
                         id = id,
@@ -768,7 +1025,9 @@ suspend fun fetchLocalPhotos(context: Context): List<LocalPhotoItem> = withConte
                         sizeBytes = size,
                         dateTakenMillis = date,
                         width = width,
-                        height = height
+                        height = height,
+                        isLowQuality = isLowQuality,
+                        isScreenshot = isScreenshot
                     )
                 )
             }

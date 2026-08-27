@@ -124,4 +124,61 @@
     <string name="items_pending">%1$d items pending</string>
     <string name="swipe_clean_btn">SWIPE CLEAN</string>
     <string name="clean_status">Clean! ✨</string>
+
+    <!-- Selection & Filter Strings -->
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    <string name="select_filtered">Select Filtered</string>
+    <string name="select_low_quality">Select Low-Quality</string>
+    <string name="filter_by">Filter:</string>
+    <string name="filter_all">All</string>
+    <string name="filter_low_quality">Low-Quality</string>
+    <string name="filter_screenshots">Screenshots</string>
+    <string name="filter_large_files">Large Files</string>
+    <string name="filter_duplicates">Duplicates</string>
+    <string name="no_photos_match_filter">No photos match the selected filter.</string>
+    <string name="low_quality_badge">Low Res</string>
+    <string name="screenshot_badge">Screenshot</string>
+    <string name="group_date_taken">Date Taken</string>
+    <string name="group_app_origin">App Origin</string>
+    <string name="group_all">All</string>
+    <string name="loading_photos_gallery">Loading photos from gallery…</string>
+    <string name="no_photos_gallery_title">No photos found in gallery</string>
+    <string name="no_photos_gallery_desc">Make sure gallery access permission is granted.</string>
+    <string name="dimensions_label">Dimensions: %1$d × %2$d px</string>
+    <string name="size_label">Size: %1$s</string>
+
+    <!-- Storage Distribution Circular Chart -->
+    <string name="storage_distribution_title">Storage Distribution</string>
+    <string name="storage_distribution_subtitle">Screenshots vs. Other Categories</string>
+    <string name="storage_chart_screenshots">Screenshots</string>
+    <string name="storage_chart_duplicates">Similar &amp; Bursts</string>
+    <string name="storage_chart_blurry">Blurry &amp; Low-Res</string>
+    <string name="storage_chart_heavy">Heavy Media</string>
+    <string name="storage_chart_other">Other Media</string>
+    <string name="storage_chart_total">Total Analyzed</string>
+    <string name="storage_chart_screenshots_share">%1$.1f%% Screenshots</string>
+
+    <!-- Weekly Background Worker Scan -->
+    <string name="weekly_scan_title">Weekly Duplicate Scan</string>
+    <string name="weekly_scan_desc">Background WorkManager task runs weekly to scan for duplicate screenshots and optimize storage.</string>
+    <string name="weekly_scan_notification_title">🧹 Weekly SnapSweep Cleanup</string>
+    <string name="weekly_scan_notification_body">Found %1$d clutter items (%2$d screenshots, %3$d blurry photos). Clean now to optimize storage!</string>
+    <string name="auto_scheduled_status">Weekly Scan: Active (Every 7 Days)</string>
+    <string name="run_weekly_scan_now">Run Scan Now</string>
+    <string name="weekly_scan_completed">Weekly scan completed successfully.</string>
+    <string name="scan_summary_title">Scan Summary</string>
+    <string name="smart_cleanup_queues">SMART CLEANUP QUEUES</string>
+    <string name="offline_ai_badge">100% Offline AI</string>
+    <string name="local_gallery_preview">LOCAL GALLERY PREVIEW</string>
+    <string name="content_resolver_badge">ContentResolver Grid</string>
+    <string name="one_tap_bulk_clean">ONE-TAP BULK CLEAN</string>
+    <string name="pending_trash_queue">PENDING TRASH QUEUE</string>
+    <string name="items_to_free_count">%1$d items • %2$s to free</string>
+    <string name="purge_button">PURGE</string>
+    <string name="bulk_delete_prompt">Bulk Delete %1$d Junk Photos</string>
+    <string name="screenshots_and_blurry_detected">Screenshots &amp; blurry photos detected</string>
+    <string name="clean_now_btn">CLEAN NOW</string>
+    <string name="total_clutter">Total Storage Clutter</string>
+    <string name="found_deletable_files">Found %1$d deletable files from your scans</string>
 </resources>

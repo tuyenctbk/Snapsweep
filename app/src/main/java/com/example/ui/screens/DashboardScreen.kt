@@ -82,6 +82,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Surface
+import androidx.compose.ui.res.stringResource
+import com.example.R
+import com.example.ui.components.StorageDistributionChart
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -242,7 +245,7 @@ fun DashboardScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "PENDING TRASH QUEUE",
+                                        text = stringResource(R.string.pending_trash_queue),
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             fontWeight = FontWeight.Bold,
                                             letterSpacing = 1.sp
@@ -250,7 +253,7 @@ fun DashboardScreen(
                                         color = Color.White.copy(alpha = 0.8f)
                                     )
                                     Text(
-                                        text = "${pendingTrash.size} items • $formattedTrashSize to free",
+                                        text = stringResource(R.string.items_to_free_count, pendingTrash.size, formattedTrashSize),
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                         color = Color.White
                                     )
@@ -264,7 +267,7 @@ fun DashboardScreen(
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(
-                                    text = "PURGE",
+                                    text = stringResource(R.string.purge_button),
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black),
                                     color = RoseTrash
                                 )
@@ -288,7 +291,7 @@ fun DashboardScreen(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Left Pane: Core stats & status
+                    // Left Pane: Core stats, circular storage distribution chart & status
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -300,6 +303,9 @@ fun DashboardScreen(
                             isScanning = isScanning,
                             scanProgress = scanProgress
                         )
+
+                        // Circular Storage Distribution Chart
+                        StorageDistributionChart(categories = categories)
 
                         GalleryPermissionCard(
                             hasImagesPermission = hasImagesPermission,
@@ -336,7 +342,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "SMART CLEANUP QUEUES",
+                                text = stringResource(R.string.smart_cleanup_queues),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -344,7 +350,7 @@ fun DashboardScreen(
                                 color = TextMuted
                             )
                             Text(
-                                text = "100% Offline AI",
+                                text = stringResource(R.string.offline_ai_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -365,7 +371,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "LOCAL GALLERY PREVIEW",
+                                text = stringResource(R.string.local_gallery_preview),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -373,7 +379,7 @@ fun DashboardScreen(
                                 color = TextMuted
                             )
                             Text(
-                                text = "ContentResolver Grid",
+                                text = stringResource(R.string.content_resolver_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -406,6 +412,11 @@ fun DashboardScreen(
                             isScanning = isScanning,
                             scanProgress = scanProgress
                         )
+                    }
+
+                    // Circular Storage Distribution Chart
+                    item {
+                        StorageDistributionChart(categories = categories)
                     }
 
                     // Cleanup Streak Tracker Card
@@ -493,7 +504,7 @@ fun DashboardScreen(
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Column {
                                             Text(
-                                                text = "ONE-TAP BULK CLEAN",
+                                                text = stringResource(R.string.one_tap_bulk_clean),
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     fontWeight = FontWeight.Bold,
                                                     letterSpacing = 1.sp
@@ -501,12 +512,12 @@ fun DashboardScreen(
                                                 color = RoseTrash
                                             )
                                             Text(
-                                                text = "Bulk Delete $bulkCleanItemCount Junk Photos",
+                                                text = stringResource(R.string.bulk_delete_prompt, bulkCleanItemCount),
                                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                                 color = Color.White
                                             )
                                             Text(
-                                                text = "Screenshots & blurry photos detected",
+                                                text = stringResource(R.string.screenshots_and_blurry_detected),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = Color.LightGray
                                             )
@@ -520,7 +531,7 @@ fun DashboardScreen(
                                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
                                         Text(
-                                            text = "CLEAN NOW",
+                                            text = stringResource(R.string.clean_now_btn),
                                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black),
                                             color = Color.White
                                         )
@@ -540,7 +551,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "SMART CLEANUP QUEUES",
+                                text = stringResource(R.string.smart_cleanup_queues),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -549,7 +560,7 @@ fun DashboardScreen(
                             )
 
                             Text(
-                                text = "100% Offline AI",
+                                text = stringResource(R.string.offline_ai_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )
@@ -574,7 +585,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "LOCAL GALLERY PREVIEW",
+                                text = stringResource(R.string.local_gallery_preview),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
@@ -583,7 +594,7 @@ fun DashboardScreen(
                             )
 
                             Text(
-                                text = "ContentResolver Grid",
+                                text = stringResource(R.string.content_resolver_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CyanPrimary
                             )

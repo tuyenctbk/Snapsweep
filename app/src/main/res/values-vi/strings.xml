@@ -124,4 +124,61 @@
     <string name="items_pending">Còn lại %1$d mục</string>
     <string name="swipe_clean_btn">VUỐT ĐỂ DỌN</string>
     <string name="clean_status">Đã dọn sạch! ✨</string>
+
+    <!-- Selection & Filter Strings -->
+    <string name="select_all">Chọn Tất Cả</string>
+    <string name="deselect_all">Bỏ Chọn Tất Cả</string>
+    <string name="select_filtered">Chọn Mục Đã Lọc</string>
+    <string name="select_low_quality">Chọn Ảnh Kém Chất Lượng</string>
+    <string name="filter_by">Bộ Lọc:</string>
+    <string name="filter_all">Tất Cả</string>
+    <string name="filter_low_quality">Chất Lượng Thấp</string>
+    <string name="filter_screenshots">Ảnh Màn Hình</string>
+    <string name="filter_large_files">Tệp Dung Lượng Lớn</string>
+    <string name="filter_duplicates">Ảnh Trùng Lặp</string>
+    <string name="no_photos_match_filter">Không có ảnh nào khớp với bộ lọc đã chọn.</string>
+    <string name="low_quality_badge">Độ Phân Giải Thấp</string>
+    <string name="screenshot_badge">Ảnh Màn Hình</string>
+    <string name="group_date_taken">Ngày Chụp</string>
+    <string name="group_app_origin">Nguồn Ứng Dụng</string>
+    <string name="group_all">Tất Cả</string>
+    <string name="loading_photos_gallery">Đang tải ảnh từ thư viện…</string>
+    <string name="no_photos_gallery_title">Không tìm thấy ảnh trong thư viện</string>
+    <string name="no_photos_gallery_desc">Hãy đảm bảo quyền truy cập thư viện ảnh đã được cấp.</string>
+    <string name="dimensions_label">Kích thước: %1$d × %2$d px</string>
+    <string name="size_label">Dung lượng: %1$s</string>
+
+    <!-- Storage Distribution Circular Chart -->
+    <string name="storage_distribution_title">Phân Bổ Dung Lượng</string>
+    <string name="storage_distribution_subtitle">Ảnh Màn Hình so với Các Danh Mục Khác</string>
+    <string name="storage_chart_screenshots">Ảnh Màn Hình</string>
+    <string name="storage_chart_duplicates">Trùng Lặp &amp; Chụp Liên Tục</string>
+    <string name="storage_chart_blurry">Ảnh Mờ &amp; Độ Phân Giải Thấp</string>
+    <string name="storage_chart_heavy">Video Dung Lượng Lớn</string>
+    <string name="storage_chart_other">Phương Tiện Khác</string>
+    <string name="storage_chart_total">Tổng Dung Lượng Phân Tích</string>
+    <string name="storage_chart_screenshots_share">%1$.1f%% Ảnh Màn Hình</string>
+
+    <!-- Weekly Background Worker Scan -->
+    <string name="weekly_scan_title">Quét Ảnh Trùng Hàng Tuần</string>
+    <string name="weekly_scan_desc">Tác vụ WorkManager chạy quét ngầm hàng tuần để tìm ảnh chụp màn hình trùng lặp và tối ưu hóa bộ nhớ tự động.</string>
+    <string name="weekly_scan_notification_title">🧹 Dọn Dẹp Định Kỳ SnapSweep</string>
+    <string name="weekly_scan_notification_body">Tìm thấy %1$d mục rác (%2$d ảnh màn hình, %3$d ảnh mờ). Hãy dọn dẹp ngay để tối ưu hóa bộ nhớ!</string>
+    <string name="auto_scheduled_status">Tự Động Quét Hàng Tuần: Đang Bật (Mỗi 7 Ngày)</string>
+    <string name="run_weekly_scan_now">Chạy Quét Ngay</string>
+    <string name="weekly_scan_completed">Đã hoàn thành quét định kỳ thành công.</string>
+    <string name="scan_summary_title">Tổng Quan Quét</string>
+    <string name="smart_cleanup_queues">HÀNG ĐỢI DỌN DẸP THÔNG MINH</string>
+    <string name="offline_ai_badge">AI 100% Ngoại Tuyến</string>
+    <string name="local_gallery_preview">XEM TRƯỚC THƯ VIỆN NỘI BỘ</string>
+    <string name="content_resolver_badge">Lưới ContentResolver</string>
+    <string name="one_tap_bulk_clean">DỌN NHANH 1 CHẠM</string>
+    <string name="pending_trash_queue">HÀNG ĐỢI THÙNG RÁC CHỜ XỬ LÝ</string>
+    <string name="items_to_free_count">%1$d mục • %2$s để giải phóng</string>
+    <string name="purge_button">DỌN SẠCH</string>
+    <string name="bulk_delete_prompt">Xóa Hàng Loạt %1$d Ảnh Rác</string>
+    <string name="screenshots_and_blurry_detected">Đã phát hiện ảnh chụp màn hình &amp; ảnh mờ</string>
+    <string name="clean_now_btn">DỌN NGAY</string>
+    <string name="total_clutter">Tổng Rác Bộ Nhớ</string>
+    <string name="found_deletable_files">Tìm thấy %1$d tệp có thể dọn dẹp</string>
 </resources>

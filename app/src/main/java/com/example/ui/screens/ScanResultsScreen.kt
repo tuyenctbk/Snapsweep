@@ -71,6 +71,7 @@ import com.example.ui.theme.RoseTrash
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
+import com.example.ui.components.StorageDistributionChart
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -113,7 +114,7 @@ fun ScanResultsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Scan Summary",
+                        text = stringResource(R.string.scan_summary_title),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
                         color = TextPrimary
                     )
@@ -142,6 +143,10 @@ fun ScanResultsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Storage Distribution Chart
+            item {
+                StorageDistributionChart(categories = categories)
+            }
             // Summary Banner
             item {
                 Surface(
